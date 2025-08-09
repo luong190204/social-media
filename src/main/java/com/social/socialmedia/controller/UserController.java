@@ -1,7 +1,9 @@
 package com.social.socialmedia.controller;
 
+import com.social.socialmedia.dto.request.UserCreationRequest;
+import com.social.socialmedia.dto.request.UserUpdateRequest;
 import com.social.socialmedia.entity.User;
-import com.social.socialmedia.repository.UserRepository;
+import com.social.socialmedia.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +14,30 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
+    User createUser(@RequestBody UserCreationRequest request) {
+        return userService.createUser(request);
+    }
+
+    @GetMapping
+    List<User> getUsers() {
+        return userService.getUsers();
+    }
+
+    @GetMapping("/{userId}")
+    User getUser(@PathVariable String userId) {
+        return userService.getUser(userId);
+    }
+
+    @PutMapping("/{userId}")
+    User updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+        return userService.updateUser(userId, request);
+    }
+
+    @DeleteMapping("/{userId}")
+    void deleteUser(@PathVariable String userId) {
+        userService.deleteUser(userId);
     }
 }
