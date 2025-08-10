@@ -3,6 +3,9 @@ package com.social.socialmedia.service;
 import com.social.socialmedia.dto.request.UserCreationRequest;
 import com.social.socialmedia.dto.request.UserUpdateRequest;
 import com.social.socialmedia.entity.User;
+import com.social.socialmedia.exception.AppException;
+import com.social.socialmedia.exception.ErrorCode;
+import com.social.socialmedia.mapper.UserMapper;
 import com.social.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,13 +17,15 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public User createUser (UserCreationRequest request) {
-        User user = new User();
+    @Autowired
+    UserMapper userMapper;
 
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setFullName(request.getFullName());
-        user.setPassword(request.getPassword());
+    public User createUser (UserCreationRequest request) {
+
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new AppException(ErrorCode.USER_EXISTED);
+
+        User user = userMapper.toUser(request);
 
         return userRepository.save(user);
     }

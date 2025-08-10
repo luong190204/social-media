@@ -1,6 +1,8 @@
 package com.social.socialmedia.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -15,10 +17,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Document(collection = "users")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
     @Id
-    private ObjectId id;
+    private String id;
     private String username;
     private String email;
     private String fullName; // Tên hiển thị
@@ -46,15 +50,4 @@ public class User {
     @LastModifiedDate
     private Instant updatedAt;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 }

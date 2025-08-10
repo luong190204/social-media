@@ -1,9 +1,11 @@
 package com.social.socialmedia.controller;
 
+import com.social.socialmedia.dto.request.ApiResponse;
 import com.social.socialmedia.dto.request.UserCreationRequest;
 import com.social.socialmedia.dto.request.UserUpdateRequest;
 import com.social.socialmedia.entity.User;
 import com.social.socialmedia.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +19,12 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    User createUser(@RequestBody UserCreationRequest request) {
-        return userService.createUser(request);
+    ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request) {
+        ApiResponse<User> apiResponse = new ApiResponse<>();
+
+        apiResponse.setResult(userService.createUser(request));
+
+        return apiResponse;
     }
 
     @GetMapping
