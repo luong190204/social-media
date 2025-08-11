@@ -8,6 +8,8 @@ import com.social.socialmedia.exception.ErrorCode;
 import com.social.socialmedia.mapper.UserMapper;
 import com.social.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,9 @@ public class UserService {
 
         User user = userMapper.toUser(request);
 
+        PasswordEncoder password = new BCryptPasswordEncoder(10);
+        user.setPassword(password.encode(request.getPassword()));
+
         return userRepository.save(user);
     }
 
@@ -41,9 +46,7 @@ public class UserService {
     public User updateUser(String userId, UserUpdateRequest request) {
         User user = getUser(userId);
 
-        user.setEmail(request.getEmail());
-        user.setFullName(request.getFullName());
-        user.setPassword(request.getPassword());
+        userMapper.updateUser(user, request);
 
         return userRepository.save(user);
     }
