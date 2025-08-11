@@ -1,4 +1,4 @@
-package com.social.socialmedia.dto.response;
+package com.social.socialmedia.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuthenticationResponse {
+// Verify token
+public class IntrospectRequest {
     private String token;
-    boolean authenticated;
 }
