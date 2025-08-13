@@ -4,14 +4,16 @@ import com.social.socialmedia.dto.request.ApiResponse;
 import com.social.socialmedia.dto.request.UserCreationRequest;
 import com.social.socialmedia.dto.request.UserUpdateRequest;
 import com.social.socialmedia.dto.response.UserResponse;
-import com.social.socialmedia.entity.User;
 import com.social.socialmedia.service.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -30,6 +32,12 @@ public class UserController {
 
     @GetMapping
     ApiResponse<List<UserResponse>> getUsers() {
+
+        // Log kiểm tra scope
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserController.log.info("Username: {}", authentication.getName());
+        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getUsers())
                 .build();

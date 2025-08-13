@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +29,7 @@ public class User {
     private String fullName; // Tên hiển thị
     private String password;
 
-    private List<String> role;
+    private Set<String> roles;
 
     private String profilePic;
     private String bio;

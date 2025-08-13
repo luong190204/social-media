@@ -4,21 +4,28 @@ import com.social.socialmedia.dto.request.UserCreationRequest;
 import com.social.socialmedia.dto.request.UserUpdateRequest;
 import com.social.socialmedia.dto.response.UserResponse;
 import com.social.socialmedia.entity.User;
+import com.social.socialmedia.enums.Role;
 import com.social.socialmedia.exception.AppException;
 import com.social.socialmedia.exception.ErrorCode;
 import com.social.socialmedia.mapper.UserMapper;
 import com.social.socialmedia.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 public class UserService {
+
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     UserMapper userMapper;
@@ -30,8 +37,13 @@ public class UserService {
 
         User user = userMapper.toUser(request);
 
-        PasswordEncoder password = new BCryptPasswordEncoder(10);
-        user.setPassword(password.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // Set role
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.USER.name());
+
+        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
