@@ -1,5 +1,6 @@
 package com.social.socialmedia.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +26,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINT = {"/api/users", "/api/auth/login", "/api/auth/introspect"};
+    private final String[] PUBLIC_ENDPOINT = {"/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/introspect"};
 
-    @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -39,24 +40,14 @@ public class SecurityConfig {
 
         // Config: cần phải có bearer token mới get được những api không public
         http.oauth2ResourceServer(oauth2 ->
-                    oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()))
+                    oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
+                                    .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                             .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 );
 
         http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
-
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
     }
 
     // custom cách Spring Security lấy và xử lý quyền (authorities) từ JWT

@@ -1,12 +1,13 @@
 package com.social.socialmedia.controller;
 
 import com.nimbusds.jose.JOSEException;
-import com.social.socialmedia.dto.request.ApiResponse;
-import com.social.socialmedia.dto.request.AuthenticationRequest;
-import com.social.socialmedia.dto.request.IntrospectRequest;
+import com.social.socialmedia.dto.request.*;
 import com.social.socialmedia.dto.response.AuthenticationResponse;
 import com.social.socialmedia.dto.response.IntrospectResponse;
+import com.social.socialmedia.dto.response.UserResponse;
 import com.social.socialmedia.service.AuthenticationService;
+import com.social.socialmedia.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,11 +23,30 @@ public class AuthenticationController {
     @Autowired
     AuthenticationService authenticationService;
 
+    @Autowired
+    UserService userService;
+
+    @PostMapping("/register")
+    ApiResponse<UserResponse> register(@RequestBody @Valid UserCreationRequest request) {
+        var result = userService.createUser(request);
+        return ApiResponse.<UserResponse>builder()
+                .result(result)
+                .build();
+    }
+
     @PostMapping("/login")
     ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
         var result = authenticationService.authentication(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
                 .build();
     }
 

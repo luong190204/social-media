@@ -7,11 +7,14 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.social.socialmedia.dto.request.AuthenticationRequest;
 import com.social.socialmedia.dto.request.IntrospectRequest;
+import com.social.socialmedia.dto.request.LogoutRequest;
 import com.social.socialmedia.dto.response.AuthenticationResponse;
 import com.social.socialmedia.dto.response.IntrospectResponse;
+import com.social.socialmedia.entity.RevokedToken;
 import com.social.socialmedia.entity.User;
 import com.social.socialmedia.exception.AppException;
 import com.social.socialmedia.exception.ErrorCode;
+import com.social.socialmedia.repository.RevokedTokenRepository;
 import com.social.socialmedia.repository.UserRepository;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +25,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -35,6 +38,9 @@ public class AuthenticationService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RevokedTokenRepository revokedTokenRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -57,11 +63,42 @@ public class AuthenticationService {
                 .build();
     }
 
-    // Verify token
+    // Check token
     public IntrospectResponse introspect(IntrospectRequest request)
             throws JOSEException, ParseException {
         var token = request.getToken();
+        Boolean isValid = true;
 
+        try {
+            verifyToken(token);
+        } catch (AppException e) {
+            isValid = false;
+        }
+
+        return IntrospectResponse.builder()
+                .valid(isValid)
+                .build();
+    }
+
+    // Logout
+    public void logout(LogoutRequest request)
+            throws ParseException, JOSEException {
+        var signToken = verifyToken(request.getToken());
+
+        String jti = signToken.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        RevokedToken revokedToken = RevokedToken.builder()
+                .id(jti)
+                .expiryTime(expiryTime)
+                .build();
+
+        revokedTokenRepository.save(revokedToken);
+    }
+
+    // Verify token
+    private SignedJWT verifyToken(String token)
+            throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -70,9 +107,14 @@ public class AuthenticationService {
 
         var verified = signedJWT.verify(verifier);
 
-        return IntrospectResponse.builder()
-                .valid( verified && expiryTime.after(new Date()))
-                .build();
+        if (!(verified && expiryTime.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        // Kiểm tra token đã logout chưa
+        if (revokedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return signedJWT;
     }
 
     // Tạo token
@@ -87,6 +129,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 )) // Thời hạn của token là sau 1h
+                .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
 

@@ -21,7 +21,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping
+    @PostMapping("/create")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
 
