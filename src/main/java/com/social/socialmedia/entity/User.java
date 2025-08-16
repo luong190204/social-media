@@ -1,6 +1,8 @@
 package com.social.socialmedia.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.social.socialmedia.enums.Gender;
+import com.social.socialmedia.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -34,21 +37,20 @@ public class User {
     private String profilePic;
     private String bio;
 
-    private List<ObjectId> friends;
-    private List<ObjectId> followers;
-    private List<ObjectId> following; // danh sách id mình theo dõi
+    private List<String> friends;
+    private List<String> followers;
+    private List<String> following; // danh sách id mình theo dõi
 
     private String location;
-    private String gender;
-    private Instant dateOfBirth;
+    private Gender gender;
+    private LocalDate dob;
 
     private boolean isVerified;
-    private String status;
+    private Status status;
 
     @CreatedDate
     private Instant createdAt;
 
     @LastModifiedDate
     private Instant updatedAt;
-
 }

@@ -17,7 +17,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 
@@ -32,6 +34,9 @@ public class UserService {
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    CloudinaryService cloudinaryService;
 
     public UserResponse createUser (UserCreationRequest request) {
 
@@ -63,17 +68,31 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_FOUND)));
     }
 
-    public UserResponse updateUser(String userId, UserUpdateRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
+    public UserResponse updateUser(UserUpdateRequest request) {
+        var userName = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByUsername(userName).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    public UserResponse updateAvatar(MultipartFile file) {
+        var userName = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByUsername(userName).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        String imgUrl = cloudinaryService.uploadFile(file);
+
+        user.setProfilePic(imgUrl);
+        user.setUpdatedAt(Instant.now());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
+
 
     public UserResponse getMyInfo() {
         // get được user đang login hiện tại

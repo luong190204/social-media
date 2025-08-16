@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.social.socialmedia.dto.request.AuthenticationRequest;
 import com.social.socialmedia.dto.request.IntrospectRequest;
 import com.social.socialmedia.dto.request.LogoutRequest;
+import com.social.socialmedia.dto.request.RefreshRequest;
 import com.social.socialmedia.dto.response.AuthenticationResponse;
 import com.social.socialmedia.dto.response.IntrospectResponse;
 import com.social.socialmedia.entity.RevokedToken;
@@ -46,6 +47,14 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected Long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    protected Long REFRESHABLE_DURATION;
+
     public AuthenticationResponse authentication(AuthenticationRequest request) {
         var user = userRepository.findByUsername(request.getUsername()).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -70,7 +79,7 @@ public class AuthenticationService {
         Boolean isValid = true;
 
         try {
-            verifyToken(token);
+            verifyToken(token, false);
         } catch (AppException e) {
             isValid = false;
         }
@@ -83,7 +92,7 @@ public class AuthenticationService {
     // Logout
     public void logout(LogoutRequest request)
             throws ParseException, JOSEException {
-        var signToken = verifyToken(request.getToken());
+        var signToken = verifyToken(request.getToken(), true);
 
         String jti = signToken.getJWTClaimsSet().getJWTID();
         Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
@@ -96,14 +105,18 @@ public class AuthenticationService {
         revokedTokenRepository.save(revokedToken);
     }
 
-    // Verify token
-    private SignedJWT verifyToken(String token)
+    // Verify token. kiểm tra token hợp lệ
+    private SignedJWT verifyToken(String token, boolean isRefresh)
             throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        // Nếu refresh thì lấy REFRESHABLE_DURATION còn introspect thì lấy ExpirationTime
+        Date expiryTime = (isRefresh)
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant()
+                    .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
 
@@ -117,6 +130,39 @@ public class AuthenticationService {
         return signedJWT;
     }
 
+    // Refresh token
+    public AuthenticationResponse refreshToken(RefreshRequest request)
+            throws ParseException, JOSEException {
+        // Kiểm tra token còn hiệu lực không
+        var signJWT = verifyToken(request.getToken(), true);
+
+        var jti = signJWT.getJWTClaimsSet().getJWTID();
+
+        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
+
+        // cho vào table black list token
+        RevokedToken revokedToken = RevokedToken.builder()
+                .id(jti)
+                .expiryTime(expiryTime)
+                .build();
+
+        revokedTokenRepository.save(revokedToken);
+
+        // Lấy ra username từ jwt được verify
+        var userName = signJWT.getJWTClaimsSet().getSubject();
+
+        var user = userRepository.findByUsername(userName).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHENTICATED)
+        );
+
+        var token = generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
+    }
+
     // Tạo token
     private String generateToken(User user) {
 
@@ -127,7 +173,7 @@ public class AuthenticationService {
                 .issuer("social.com") // Xác định issuer từ ai
                 .issueTime(new Date()) // thời điểm hiện tại
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
                 )) // Thời hạn của token là sau 1h
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))

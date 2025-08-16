@@ -4,72 +4,86 @@ import com.social.socialmedia.dto.request.ApiResponse;
 import com.social.socialmedia.dto.request.UserCreationRequest;
 import com.social.socialmedia.dto.request.UserUpdateRequest;
 import com.social.socialmedia.dto.response.UserResponse;
+import com.social.socialmedia.entity.User;
+import com.social.socialmedia.service.CloudinaryService;
 import com.social.socialmedia.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
-@Slf4j
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
+    @Slf4j
+    @RestController
+    @RequestMapping("/api/users")
+    public class UserController {
 
-    @Autowired
-    UserService userService;
+        @Autowired
+        UserService userService;
 
-    @PostMapping("/create")
-    ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        @Autowired
+        CloudinaryService fileUploadService;
 
-        apiResponse.setResult(userService.createUser(request));
+        @PostMapping("/create")
+        ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+            ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
 
-        return apiResponse;
-    }
+            apiResponse.setResult(userService.createUser(request));
 
-    @GetMapping
-    ApiResponse<List<UserResponse>> getUsers() {
+            return apiResponse;
+        }
 
-        // Log kiểm tra scope
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserController.log.info("Username: {}", authentication.getName());
-        authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+        @GetMapping
+        ApiResponse<List<UserResponse>> getUsers() {
 
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getUsers())
-                .build();
-    }
+            // Log kiểm tra scope
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserController.log.info("Username: {}", authentication.getName());
+            authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
 
-    @GetMapping("/{userId}")
-    ApiResponse<UserResponse> getUser(@PathVariable String userId) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getUser(userId))
-                .build();
+            return ApiResponse.<List<UserResponse>>builder()
+                    .result(userService.getUsers())
+                    .build();
+        }
 
-    }
+        @GetMapping("/{userId}")
+        ApiResponse<UserResponse> getUser(@PathVariable String userId) {
+            return ApiResponse.<UserResponse>builder()
+                    .result(userService.getUser(userId))
+                    .build();
 
-    @PutMapping("/{userId}")
-    ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.updateUser(userId, request))
-                .build();
-    }
+        }
 
-    @GetMapping("/my-info")
-    ApiResponse<UserResponse> getMyInfo() {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getMyInfo())
-                .build();
-    }
+        @PutMapping
+        ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest request) {
+            return ApiResponse.<UserResponse>builder()
+                    .result(userService.updateUser(request))
+                    .build();
+        }
 
-    @DeleteMapping("/{userId}")
-    ApiResponse<String> deleteUser(@PathVariable String userId) {
-        userService.deleteUser(userId);
-        return ApiResponse.<String>builder()
-                .result("User has been deleted")
-                .build();
-    }
+        @PutMapping("/update-avatar")
+        ApiResponse<UserResponse> updateAvatar(@RequestParam("file")MultipartFile file) {
+            return ApiResponse.<UserResponse>builder()
+                    .result(userService.updateAvatar(file))
+                    .build();
+        }
+
+        @GetMapping("/my-info")
+        ApiResponse<UserResponse> getMyInfo() {
+            return ApiResponse.<UserResponse>builder()
+                    .result(userService.getMyInfo())
+                    .build();
+        }
+
+        @DeleteMapping("/{userId}")
+        ApiResponse<String> deleteUser(@PathVariable String userId) {
+            userService.deleteUser(userId);
+            return ApiResponse.<String>builder()
+                    .result("User has been deleted")
+                    .build();
+        }
 }
