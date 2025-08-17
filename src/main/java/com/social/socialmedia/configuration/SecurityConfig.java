@@ -26,7 +26,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINT = {"/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/introspect", "/api/auth/refresh"};
+    private final String[] PUBLIC_ENDPOINT = {"/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/introspect"
+            , "/api/auth/refresh", "/api/posts"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -36,6 +37,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(request ->
                     request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                            .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                             .anyRequest().authenticated()); //Còn lại all request phải xác thực
 
         // Config: cần phải có bearer token mới get được những api không public

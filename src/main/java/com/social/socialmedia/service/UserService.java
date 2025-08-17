@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class UserService {
         String imgUrl = cloudinaryService.uploadFile(file);
 
         user.setProfilePic(imgUrl);
-        user.setUpdatedAt(Instant.now());
+        user.setUpdatedAt(LocalDateTime.now());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

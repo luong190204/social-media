@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -55,8 +56,8 @@ public class User {
     private Status status;
 
     @CreatedDate
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 }

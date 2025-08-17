@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +38,6 @@ public class UserResponse {
     private List<String> followers;
     private List<String> following;
 
-    private Instant createdAt;
-    private Instant updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
