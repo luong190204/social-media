@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,9 +38,14 @@ public class User {
     private String profilePic;
     private String bio;
 
-    private List<String> friends;
-    private List<String> followers;
-    private List<String> following; // danh sách id mình theo dõi
+    @Builder.Default
+    private List<String> friends = new ArrayList<>();
+
+    @Builder.Default
+    private List<String> followers = new ArrayList<>();  //id của người follow mình
+
+    @Builder.Default
+    private List<String> following = new ArrayList<>(); // id của người mình follow
 
     private String location;
     private Gender gender;
