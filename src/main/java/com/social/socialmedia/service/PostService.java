@@ -4,6 +4,7 @@ import com.social.socialmedia.dto.request.CommentRequest;
 import com.social.socialmedia.dto.request.PostCreateRequest;
 import com.social.socialmedia.dto.request.PostUpdateRequest;
 import com.social.socialmedia.dto.response.CommentResponse;
+import com.social.socialmedia.dto.response.PageCommentResponse;
 import com.social.socialmedia.dto.response.PostLikeResponse;
 import com.social.socialmedia.dto.response.PostResponse;
 import com.social.socialmedia.entity.Comment;
@@ -20,18 +21,24 @@ import com.social.socialmedia.repository.CommentPostRepository;
 import com.social.socialmedia.repository.PostLikeRepository;
 import com.social.socialmedia.repository.PostRepository;
 import com.social.socialmedia.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Pageable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class PostService {
 
@@ -162,38 +169,41 @@ public class PostService {
         return response;
     }
 
+    // Lấy comment cha + preview replies
     public List<CommentResponse> getCommentsByPost(String postId, int page, int size) {
-        Pageable pageable = (Pageable) PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
-        // Lấy comment cha
-        List<Comment> parentComments = commentPostRepository.findByPostIdAndParentId(postId, null, pageable);
+        // Lấy danh sách comment CHA
+        Page<Comment> parents = commentPostRepository.findByPostIdAndParentId(postId, null, pageable);
 
-        // Map sang dto
-        List<CommentResponse> responses = parentComments.stream().map(comment -> {
-            CommentResponse response = commentMapper.toCommentResponse(comment);
+        // Map từng comment CHA -> CommentResponse và gắn replies
+        return parents.stream()
+                .map(parent -> {
+                    CommentResponse parentDto = toDtoResponse(parent);
+                    System.out.println("Parent: "+ parent);
+                    // Lấy replies của CHA hiện tại và map sang DTO
+                    List<CommentResponse> replies = commentPostRepository.findByParentId(parent.getId())
+                            .stream()
+                            .map(this::toDtoResponse)
+                            .toList();
 
-            User user = userRepository.findById(comment.getId()).orElseThrow(
-                    () -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-            response.setAuthorName(user.getUsername());
-
-            // Lấy reply
-            List<Comment> replies = commentPostRepository.findByParentId(comment.getId());
-            List<CommentResponse> replyResponses = replies.stream().map(reply -> {
-                CommentResponse r = commentMapper.toCommentResponse(reply);
-                User replyUser = userRepository.findById(reply.getId()).orElseThrow(
-                        () -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-                r.setAuthorName(replyUser.getUsername());
-                return r;
-            }).toList();
-
-            response.setReplies(replyResponses);
-            return response;
-        }).toList();
-
-        return responses;
+                    parentDto.setReplies(replies);
+                    return parentDto;
+                })
+                .toList();
     }
+
+    /** Map Comment -> CommentResponse, kèm authorName */
+    private CommentResponse toDtoResponse(Comment comment) {
+        CommentResponse response = commentMapper.toCommentResponse(comment);
+
+        User author = userRepository.findById(response.getUserId()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        response.setAuthorName(author.getUsername());
+        return response;
+    }
+
 }
 
 

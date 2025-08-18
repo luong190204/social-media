@@ -21,6 +21,7 @@ public class CommentResponse {
 
     // optional
     private String authorName;   // lấy từ user
+    private String authorAvatar;
 
     private List<CommentResponse> replies; // danh sách reply
 

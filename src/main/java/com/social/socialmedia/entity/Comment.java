@@ -25,7 +25,7 @@ public class Comment {
 
     private String postId;
     private String userId;
-    private String parentId; // id Reply comment, Có thể null
+    private String parentId; // id comment để reply, Có thể null
 
     private String content;
 
