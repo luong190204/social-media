@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Comment {
     @Id
-    private String id; // ObjectId
+    private String id;
 
     private String postId;
     private String userId;
-    private String parentId; // Có thể null
+    private String parentId; // id Reply comment, Có thể null
 
     private String content;
 

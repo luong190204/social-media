@@ -1,8 +1,11 @@
 package com.social.socialmedia.controller;
 
 import com.social.socialmedia.dto.request.ApiResponse;
+import com.social.socialmedia.dto.request.CommentRequest;
 import com.social.socialmedia.dto.request.PostCreateRequest;
 import com.social.socialmedia.dto.request.PostUpdateRequest;
+import com.social.socialmedia.dto.response.CommentResponse;
+import com.social.socialmedia.dto.response.PostLikeResponse;
 import com.social.socialmedia.dto.response.PostResponse;
 import com.social.socialmedia.service.PostService;
 import jakarta.validation.Valid;
@@ -54,6 +57,30 @@ public class PostController {
         postService.deletePost(postId);
         return ApiResponse.<String>builder()
                 .result("Post has been deleted")
+                .build();
+    }
+
+    @PostMapping("/{postId}/like")
+    public ApiResponse<PostLikeResponse> toggleLike(@PathVariable String postId) {
+        return ApiResponse.<PostLikeResponse>builder()
+                .result(postService.toggleLike(postId))
+                .build();
+    }
+
+    @PostMapping("/{postId}/comment")
+    public ApiResponse<CommentResponse> comment(@PathVariable String postId, @RequestBody CommentRequest request) {
+        return ApiResponse.<CommentResponse>builder()
+                .result(postService.commentPost(postId, request))
+                .build();
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ApiResponse<List<CommentResponse>> getCommentsByPost(
+            @PathVariable String postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<List<CommentResponse>>builder()
+                .result(postService.getCommentsByPost(postId, page, size))
                 .build();
     }
 }
