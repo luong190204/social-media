@@ -10,6 +10,7 @@ import com.social.socialmedia.dto.response.PostResponse;
 import com.social.socialmedia.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,12 +76,32 @@ public class PostController {
     }
 
     @GetMapping("/{postId}/comments")
-    public ApiResponse<List<CommentResponse>> getCommentsByPost(
+    public ApiResponse<Page<CommentResponse>> getCommentsByPost(
             @PathVariable String postId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.<List<CommentResponse>>builder()
-                .result(postService.getCommentsByPost(postId, page, size))
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort) {
+
+        Page<CommentResponse> comments = postService.getCommentByPost(postId, page, size, sort);
+
+        return ApiResponse.<Page<CommentResponse>>builder()
+                .result(comments)
                 .build();
     }
+
+    @GetMapping("/comments/{commentId}/replies")
+    public ApiResponse<Page<CommentResponse>> getRepliesByComment(
+            @PathVariable String commentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort) {
+
+        Page<CommentResponse> replies = postService.getRepliesByComment(commentId, page, size, sort);
+
+        return ApiResponse.<Page<CommentResponse>>builder()
+                .result(replies)
+                .build();
+    }
+
+
 }

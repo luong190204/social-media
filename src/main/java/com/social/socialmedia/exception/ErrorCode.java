@@ -16,7 +16,7 @@ public enum ErrorCode {
         UNAUTHORIZED(1007, "You not have permission", HttpStatus.FORBIDDEN),
         INVALID_DOB(1008, "your age must be at least {min}", HttpStatus.BAD_REQUEST),
         INVALID_KEY(1009, "Uncategorized error", HttpStatus.BAD_REQUEST),
-        POST_FOUND(1010, "Post not found", HttpStatus.BAD_REQUEST),
+        POST_NOT_FOUND(1010, "Post not found", HttpStatus.BAD_REQUEST),
         POSTLIKE_FOUND(1011, "You already liked this post", HttpStatus.BAD_REQUEST),
     ;
 

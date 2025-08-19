@@ -4,7 +4,6 @@ import com.social.socialmedia.dto.request.CommentRequest;
 import com.social.socialmedia.dto.request.PostCreateRequest;
 import com.social.socialmedia.dto.request.PostUpdateRequest;
 import com.social.socialmedia.dto.response.CommentResponse;
-import com.social.socialmedia.dto.response.PageCommentResponse;
 import com.social.socialmedia.dto.response.PostLikeResponse;
 import com.social.socialmedia.dto.response.PostResponse;
 import com.social.socialmedia.entity.Comment;
@@ -22,8 +21,8 @@ import com.social.socialmedia.repository.PostLikeRepository;
 import com.social.socialmedia.repository.PostRepository;
 import com.social.socialmedia.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,8 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -97,13 +94,13 @@ public class PostService {
     @PostAuthorize("returnObject.authorId == authentication.token.claims['id']")
     public PostResponse getPost(String postId) {
         return postMapper.toPostResponse(postRepository.findById(postId).orElseThrow(
-                () -> new AppException(ErrorCode.POST_FOUND)));
+                () -> new AppException(ErrorCode.POST_NOT_FOUND)));
     }
 
     @PreAuthorize("@postSecurity.isAuthor(#postId, authentication)")
     public PostResponse updatePost(String postId, PostUpdateRequest request) {
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new AppException(ErrorCode.POST_FOUND));
+                () -> new AppException(ErrorCode.POST_NOT_FOUND));
 
         postMapper.updatePost(post, request);
         return postMapper.toPostResponse(postRepository.save(post));
@@ -153,7 +150,7 @@ public class PostService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_FOUND));
+        postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
 
         // Map request -> entity
         Comment comment = commentMapper.toComment(request);
@@ -169,31 +166,38 @@ public class PostService {
         return response;
     }
 
-    // Lấy comment cha + preview replies
-    public List<CommentResponse> getCommentsByPost(String postId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    // Get Comments
+    public Page<CommentResponse> getCommentByPost(String postId, int page, int size, String sort) {
 
-        // Lấy danh sách comment CHA
-        Page<Comment> parents = commentPostRepository.findByPostIdAndParentId(postId, null, pageable);
+        log.debug("Fetching comments for postId: {}, page: {}, size: {}, sort: {}",
+                postId, page, size, sort);
 
-        // Map từng comment CHA -> CommentResponse và gắn replies
-        return parents.stream()
-                .map(parent -> {
-                    CommentResponse parentDto = toDtoResponse(parent);
-                    System.out.println("Parent: "+ parent);
-                    // Lấy replies của CHA hiện tại và map sang DTO
-                    List<CommentResponse> replies = commentPostRepository.findByParentId(parent.getId())
-                            .stream()
-                            .map(this::toDtoResponse)
-                            .toList();
+        // kiểm tra post tôn tại k
+        if (!postRepository.existsById(postId)) throw new AppException(ErrorCode.POST_NOT_FOUND);
 
-                    parentDto.setReplies(replies);
-                    return parentDto;
-                })
-                .toList();
+        // Xử lý sắp xếp
+        Sort sortOder = parseSort(sort);
+        Pageable pageable = PageRequest.of(page, size, sortOder);
+
+        // Lấy bình luận cha và tt người dùng
+        Page<Comment> parentPage = commentPostRepository.findByPostIdAndParentId(postId, null, pageable);
+
+        // Convert sang DTO + gắn thông tin user
+        return parentPage.map(this::toDtoResponse);
     }
 
-    /** Map Comment -> CommentResponse, kèm authorName */
+    public Page<CommentResponse> getRepliesByComment(String parentCommentId, int page, int size, String sort) {
+        log.debug("Fetching replies for commentId: {}, page: {}, size: {}, sort: {}",
+                parentCommentId, page, size, sort);
+
+        Sort sortOrder = parseSort(sort);
+        Pageable pageable =  PageRequest.of(page, size, sortOrder);
+
+        Page<Comment> replies = commentPostRepository.findByParentId(parentCommentId, pageable);
+
+        return replies.map(this::toDtoResponse);
+    }
+
     private CommentResponse toDtoResponse(Comment comment) {
         CommentResponse response = commentMapper.toCommentResponse(comment);
 
@@ -201,7 +205,24 @@ public class PostService {
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         response.setAuthorName(author.getUsername());
+        response.setAuthorAvatar(author.getProfilePic());
+
         return response;
+    }
+
+    // Helper parse sort param createdAt
+    private Sort parseSort(String sort) {
+        if (sort == null || sort.isBlank()) {
+            return Sort.by(Sort.Order.desc("createdAt"));
+        }
+
+        String[] parts = sort.split(",");
+        String field = parts[0];
+        Sort.Direction direction = (parts.length > 1 && parts[1].equalsIgnoreCase("asc"))
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        return Sort.by(new Sort.Order(direction, field));
     }
 
 }
