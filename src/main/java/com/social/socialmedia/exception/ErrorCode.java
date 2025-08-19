@@ -18,6 +18,7 @@ public enum ErrorCode {
         INVALID_KEY(1009, "Uncategorized error", HttpStatus.BAD_REQUEST),
         POST_NOT_FOUND(1010, "Post not found", HttpStatus.BAD_REQUEST),
         POSTLIKE_FOUND(1011, "You already liked this post", HttpStatus.BAD_REQUEST),
+        COMMENT_NOT_FOUND(1012, "You already liked this post", HttpStatus.BAD_REQUEST),
     ;
 
 

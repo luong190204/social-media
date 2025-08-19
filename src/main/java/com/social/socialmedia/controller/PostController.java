@@ -1,9 +1,6 @@
 package com.social.socialmedia.controller;
 
-import com.social.socialmedia.dto.request.ApiResponse;
-import com.social.socialmedia.dto.request.CommentRequest;
-import com.social.socialmedia.dto.request.PostCreateRequest;
-import com.social.socialmedia.dto.request.PostUpdateRequest;
+import com.social.socialmedia.dto.request.*;
 import com.social.socialmedia.dto.response.CommentResponse;
 import com.social.socialmedia.dto.response.PostLikeResponse;
 import com.social.socialmedia.dto.response.PostResponse;
@@ -103,5 +100,20 @@ public class PostController {
                 .build();
     }
 
+    @PutMapping("/comments/{commentId}")
+    public ApiResponse<CommentResponse> updateComment(@PathVariable String commentId,
+                                                      @RequestBody CommentUpdateRequest request) {
+        return ApiResponse.<CommentResponse>builder()
+                .result(postService.updateComment(commentId, request))
+                .build();
+    }
+
+    @DeleteMapping("comments/{commentId}")
+    public ApiResponse<String> deleteComment(@PathVariable String commentId) {
+        postService.deleteComment(commentId);
+        return ApiResponse.<String>builder()
+                .result("Comment has been deleted")
+                .build();
+    }
 
 }

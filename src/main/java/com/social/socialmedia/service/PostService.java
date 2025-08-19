@@ -1,6 +1,7 @@
 package com.social.socialmedia.service;
 
 import com.social.socialmedia.dto.request.CommentRequest;
+import com.social.socialmedia.dto.request.CommentUpdateRequest;
 import com.social.socialmedia.dto.request.PostCreateRequest;
 import com.social.socialmedia.dto.request.PostUpdateRequest;
 import com.social.socialmedia.dto.response.CommentResponse;
@@ -21,6 +22,7 @@ import com.social.socialmedia.repository.PostLikeRepository;
 import com.social.socialmedia.repository.PostRepository;
 import com.social.socialmedia.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.security.SecurityUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,8 +33,10 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -169,9 +173,6 @@ public class PostService {
     // Get Comments
     public Page<CommentResponse> getCommentByPost(String postId, int page, int size, String sort) {
 
-        log.debug("Fetching comments for postId: {}, page: {}, size: {}, sort: {}",
-                postId, page, size, sort);
-
         // kiểm tra post tôn tại k
         if (!postRepository.existsById(postId)) throw new AppException(ErrorCode.POST_NOT_FOUND);
 
@@ -186,9 +187,8 @@ public class PostService {
         return parentPage.map(this::toDtoResponse);
     }
 
+    // Get replies của 1 comment
     public Page<CommentResponse> getRepliesByComment(String parentCommentId, int page, int size, String sort) {
-        log.debug("Fetching replies for commentId: {}, page: {}, size: {}, sort: {}",
-                parentCommentId, page, size, sort);
 
         Sort sortOrder = parseSort(sort);
         Pageable pageable =  PageRequest.of(page, size, sortOrder);
@@ -217,7 +217,7 @@ public class PostService {
         }
 
         String[] parts = sort.split(",");
-        String field = parts[0];
+        String field = parts[0]; // Lấy createdAt
         Sort.Direction direction = (parts.length > 1 && parts[1].equalsIgnoreCase("asc"))
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
@@ -225,6 +225,29 @@ public class PostService {
         return Sort.by(new Sort.Order(direction, field));
     }
 
+    @PreAuthorize("@commentSecurity.isAuthor(#commentId, authentication)")
+    public CommentResponse updateComment(String commentId, CommentUpdateRequest request) {
+
+        // Lấy ra comment
+        Comment comment = (commentPostRepository.findById(commentId).orElseThrow(
+                () -> new AppException(ErrorCode.COMMENT_NOT_FOUND)));
+
+        comment.setContent(request.getContent());
+        comment.setUpdatedAt(LocalDateTime.now());
+
+        commentPostRepository.save(comment);
+        return commentMapper.toCommentResponse(comment);
+    }
+
+    @Transactional
+    @PreAuthorize("@commentSecurity.isAuthorOrAdmin(#commentId, authentication)")
+    public void deleteComment (String commentId) {
+        // xóa comment con
+        commentPostRepository.deleteByParentId(commentId);
+
+        // xóa comment cha
+        commentPostRepository.deleteById(commentId);
+    }
 }
 
 
