@@ -19,6 +19,8 @@ public enum ErrorCode {
         POST_NOT_FOUND(1010, "Post not found", HttpStatus.BAD_REQUEST),
         POSTLIKE_FOUND(1011, "You already liked this post", HttpStatus.BAD_REQUEST),
         COMMENT_NOT_FOUND(1012, "You already liked this post", HttpStatus.BAD_REQUEST),
+        CONVERSATION_NOT_FOUND(1013, "Conversation not found", HttpStatus.BAD_REQUEST),
+        RECEIVER_NOT_FOUND(1014, "Receiver not found", HttpStatus.BAD_REQUEST),
     ;
 
 
