@@ -66,7 +66,7 @@ public class MessageService {
         Message message = Message.builder()
                 .conversationId(conversationId)
                 .senderId(senderId)
-                .type(TypeContent.TEXT)
+                .type(TypeContent.IMAGE)
                 .content(imageUrl)
                 .timestamp(LocalDateTime.now())
                 .status(StatusMessage.SENT)
