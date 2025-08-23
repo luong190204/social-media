@@ -33,6 +33,7 @@ public class ConversationService {
         List<String> sortedParticipants = participantIds.stream().sorted().toList();
         Optional<Conversation> existing = conversationRepository.findByParticipants(sortedParticipants);
 
+        // Nếu đã có thì trả về luôn
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -40,6 +41,7 @@ public class ConversationService {
         Conversation conversation = Conversation.builder()
                 .participants(sortedParticipants)
                 .createdAt(LocalDateTime.now())
+                // Map id participant và gán giá trị bằng 0
                 .unReadCount(sortedParticipants.stream().collect(Collectors.toMap(id -> id, id -> 0)))
                 .build();
 

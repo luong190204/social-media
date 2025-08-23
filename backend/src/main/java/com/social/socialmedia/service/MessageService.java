@@ -79,6 +79,7 @@ public class MessageService {
     }
 
     private void updateConversation(Conversation conversation, Message message, String senderId) {
+        // Set TN cuối cùng vào
         conversation.setLastMessageId(message.getId());
         String receiverId = conversation.getParticipants().stream()
                 .filter(id -> !id.equals(senderId))
