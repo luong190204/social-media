@@ -1,12 +1,58 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import React from 'react'
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
+
+import { useAuthStore } from '@/store/useAuthStore';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const SignUpPage = () => {
+
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    fullName: "",
+    password: ""
+  })
+
+  const { signup, isSigningUp } = useAuthStore();
+
+  const validateForm = () => {
+    if (!formData.username.trim()) return toast.error("Vui lòng nhập tên người dùng.");
+    if (!formData.email.trim()) return toast.error("Vui lòng nhập email.");
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email))
+      return toast.error("Email không hợp lệ.");
+    if (!formData.fullName.trim())
+      return toast.error("Vui lòng nhập tên đầy đủ.");
+    if (!formData.password.trim()) return toast.error("Vui lòng nhập mật khẩu.");
+    if (formData.password.length < 6) return toast.error("Mật khẩu phải có ít nhất 6 ký tự.");
+    
+    return true;
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const success = validateForm();
+    if (success === true) {
+      signup(formData);
+      navigate("/login");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div>
+        {/* Left side - Image */}
+        <div className="hidden lg:block mr-16">
+          <img src="/assets/landing-2x.png" alt="" />
+        </div>
+      </div>
       <div className="max-w-sm w-full">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
@@ -20,6 +66,10 @@ const SignUpPage = () => {
             <Input
               type="text"
               name="username"
+              value={formData.username}
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
               placeholder="Tên người dùng"
               className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
                   focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
@@ -28,6 +78,10 @@ const SignUpPage = () => {
             <Input
               type="text"
               name="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               placeholder="Email"
               className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
                   focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
@@ -36,26 +90,57 @@ const SignUpPage = () => {
             <Input
               type="text"
               name="fullname"
+              value={formData.fullName}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
               placeholder="Tên đầy đủ"
               className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
                   focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
             />
 
             {/* password input */}
-            <Input
-              type="password"
-              name="password"
-              placeholder="Mật khẩu"
-              className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
+            <div className="relative z-0">
+              <Input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="Mật khẩu"
+                className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
                   focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
-            />
+              />
+              {/* Show/hide password */}
+              <button
+                type="button"
+                className="absolute right-0 inset-y-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="size-5" />
+                ) : (
+                  <Eye className="size-5" />
+                )}
+              </button>
+            </div>
 
             {/* Login button */}
             <Button
+              onClick={handleSubmit}
               className="w-full bg-blue-400 hover:bg-blue-500 text-while font-medium py-2.5 px-4 rounded-lg text-sm 
                   transition-colors disabled:cursor-not-allowed disabled:hover:bg-blue-300 h-auto"
+              disabled={isSigningUp}
             >
-              Đăng nhập
+              {isSigningUp ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Đăng ký"
+              )}
             </Button>
 
             {/* Divider with Separator */}

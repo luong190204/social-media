@@ -2,12 +2,46 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Link } from "react-router-dom";
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
+import { useAuthStore } from '@/store/useAuthStore';
 
 const LoginPage = () => {
+
+  const [showPassword, setShowPassword] = useState(false);
+  const { isLoggingIng, login, lastRegisteredUsername } = useAuthStore();
+
+  const [formData, setFormdata] = useState({
+    username: "",
+    password: ""
+  })
+
+  useEffect(() => {
+    if (lastRegisteredUsername) {
+      setFormdata({ ...formData, username: lastRegisteredUsername});
+    }
+  }, [lastRegisteredUsername])
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    login(formData);
+
+    console.log(formData);
+    
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      {/* Left side - Image */}
+      <div>
+        <div className="hidden lg:block mr-16">
+          <img src="/assets/landing-2x.png" alt="" />
+        </div>
+      </div>
+
+      {/* Right form */}
       <div className="max-w-sm w-full">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
@@ -21,25 +55,57 @@ const LoginPage = () => {
             <Input
               type="text"
               name="username"
+              value={formData.username}
+              onChange={(e) =>
+                setFormdata({ ...formData, username: e.target.value })
+              }
               placeholder="Số điện thoại, tên người dùng hoặc email"
               className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
               focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
             />
             {/* password input */}
-            <Input
-              type="password"
-              name="password"
-              placeholder="Mật khẩu"
-              className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
-              focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
-            />
+            <div className='relative z-0'>
+              <Input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormdata({ ...formData, password: e.target.value })
+                }
+                placeholder="Mật khẩu"
+                className="w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-sm text-sm placeholder-gray-500 
+                  focus:outline-none focus:border-gray-400 focus:bg-white transition-all h-auto"
+              />
+
+              {/* Show/hide password */}
+              <button 
+                type='button'
+                className='absolute right-0 inset-y-0 pr-3 flex items-center'
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className='size-5'/>
+                ): (
+                  <Eye className='size-5'/>
+                )}
+              </button>
+            </div>
 
             {/* Login button */}
             <Button
+              onClick={handleSubmit}
               className="w-full bg-blue-400 hover:bg-blue-500 text-while font-medium py-2.5 px-4 rounded-lg text-sm 
               transition-colors disabled:cursor-not-allowed disabled:hover:bg-blue-300 h-auto"
+              disabled={isLoggingIng}
             >
-              Đăng nhập
+              {isLoggingIng ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+              "Đăng nhập" 
+              )}
             </Button>
 
             {/* Divider with Separator */}
@@ -106,7 +172,7 @@ const LoginPage = () => {
                 Bạn chưa có tài khoản ư?{" "}
                 <Link
                   to={"/signup"}
-                  className='text-blue-500 font-medium hover:underline p-0 h-auto text-sm'
+                  className="text-blue-500 font-medium hover:underline p-0 h-auto text-sm"
                 >
                   Đăng ký
                 </Link>
