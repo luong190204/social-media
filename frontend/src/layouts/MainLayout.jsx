@@ -1,6 +1,5 @@
 import React from 'react'
 
-import Sidebar from '@/components/Sidebar '
 import Navbar from '@/components/Navbar';
 import { Outlet } from 'react-router-dom';
 
@@ -9,7 +8,7 @@ const MainLayout = () => {
     <div className="main-layout">
       <Navbar />
       <div style={{ display: "flex" }}>
-        <Sidebar />
+        {/* <Sidebar /> */}
         <div style={{ flex: 1, padding: "1rem" }}>
           <Outlet /> {/* render các page con */}
         </div>
