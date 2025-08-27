@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { axiosInstance } from '../lib/axios';
 import { toast } from 'sonner';
+import { authService } from '@/services/authService';
 export const useAuthStore = create((set) => ({
   authUser: null,
   isSigningUp: false,
@@ -18,7 +19,7 @@ export const useAuthStore = create((set) => ({
     }
 
     try {
-      const res = await axiosInstance.get("/users/my-info");
+      const res = await authService.checkAuth();
       set({ authUser: res.data.result });
     } catch (error) {
       console.log("Error checking auth: ", error);
@@ -32,7 +33,7 @@ export const useAuthStore = create((set) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("/auth/register", data);
+      const res = await authService.signup(data);
 
       // Lưu username vừa đăng ký
       set({ lastRegisteredUsername: data.username });
@@ -50,7 +51,7 @@ export const useAuthStore = create((set) => ({
   login: async (data) => {
     set({ isLoggingIng: true });
     try {
-      const res = await axiosInstance.post("/auth/login", data);
+      const res = await authService.login(data);``
 
       const token = res.data.result.token;
       if (token) {
