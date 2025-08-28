@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-import { axiosInstance } from '../lib/axios';
 import { toast } from 'sonner';
 import { authService } from '@/services/authService';
 export const useAuthStore = create((set) => ({
@@ -68,7 +67,7 @@ export const useAuthStore = create((set) => ({
   },
 
   logout: async () => {
-    await axiosInstance.post("/auth/logout");
+    await authService.logout();
     localStorage.removeItem("token");
     toast.success("Đăng xuất thành công!");
   },

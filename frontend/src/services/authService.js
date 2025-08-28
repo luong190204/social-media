@@ -11,6 +11,9 @@ export const authService = {
 
     login: async (data) => {
         return await axiosInstance.post("auth/login", data);
+    },
+
+    logout: async () => {
+        return await axiosInstance.post("/auth/logout");
     }
-    ,
 };
