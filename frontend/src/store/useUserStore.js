@@ -1,3 +1,4 @@
+import { axiosInstance } from "@/lib/axios";
 import { userService } from "@/services/userService";
 import { toast } from "sonner";
 import { create } from "zustand";
@@ -5,6 +6,7 @@ import { create } from "zustand";
 export const useUserStore = create ((set) => ({
     userProfile: null,
     isLoadingProfile: false,
+    isUpdatingProfile: false,
 
     fetchMyProfile: async () =>  {
         set({ isLoadingProfile: true })
@@ -19,5 +21,17 @@ export const useUserStore = create ((set) => ({
         } 
     },
 
+    updateAvatar: async (data) => {
+        set({ isUpdatingProfile: true })
+        try {
+            const res = await userService.updateAvatar(data)
+            set({ userProfile: res.data.result })
+            toast.success("Cập nhật avatar thành công!")
+        } catch (error) {
+            toast.error("Cập nhật avatar thất bại!");
+        } finally {
+            set({ isUpdatingProfile: false })
+        }
+    }
 
 }))
