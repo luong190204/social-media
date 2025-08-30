@@ -35,10 +35,10 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/{postId}")
-    public ApiResponse<PostResponse> getPost(@PathVariable String postId) {
-        return ApiResponse.<PostResponse>builder()
-                .result(postService.getPost(postId))
+    @GetMapping("/user")
+    public ApiResponse<List<PostResponse>> getAllPostByUser() {
+        return ApiResponse.<List<PostResponse>>builder()
+                .result(postService.getAllPostByUser())
                 .build();
     }
 

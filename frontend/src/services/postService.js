@@ -5,8 +5,8 @@ export const postService = {
         return await axiosInstance.post("/posts", data, file)
     },
 
-    getAllPost: async () => {
-        return await axiosInstance.get("/posts")
+    getAllPostByUser: async () => {
+        return await axiosInstance.get("/posts/user")
     },
 
     getPostById: async (postId) => {

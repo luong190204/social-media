@@ -1,5 +1,6 @@
 package com.social.socialmedia.service;
 
+import com.social.socialmedia.configuration.SecurityUtils;
 import com.social.socialmedia.dto.request.CommentRequest;
 import com.social.socialmedia.dto.request.CommentUpdateRequest;
 import com.social.socialmedia.dto.request.PostCreateRequest;
@@ -7,6 +8,7 @@ import com.social.socialmedia.dto.request.PostUpdateRequest;
 import com.social.socialmedia.dto.response.CommentResponse;
 import com.social.socialmedia.dto.response.PostLikeResponse;
 import com.social.socialmedia.dto.response.PostResponse;
+import com.social.socialmedia.dto.response.UserResponse;
 import com.social.socialmedia.entity.Comment;
 import com.social.socialmedia.entity.Post;
 import com.social.socialmedia.entity.PostLike;
@@ -95,10 +97,22 @@ public class PostService {
                 .map(postMapper::toPostResponse).toList();
     }
 
-    @PostAuthorize("returnObject.authorId == authentication.token.claims['id']")
-    public PostResponse getPost(String postId) {
-        return postMapper.toPostResponse(postRepository.findById(postId).orElseThrow(
-                () -> new AppException(ErrorCode.POST_NOT_FOUND)));
+    // Lấy tất cả posts của 1 user
+    public List<PostResponse> getAllPostByUser() {
+        String currentUserId = SecurityUtils.getCurrentUserId();
+
+        return postRepository.findByAuthorId(currentUserId).stream()
+                .map(post -> {
+                    PostResponse response = postMapper.toPostResponse(post);
+                    User user = userRepository.findById(post.getAuthorId()).
+                            orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                    response.setAuthor(UserResponse.builder()
+                                    .id(user.getId())
+                                    .username(user.getUsername())
+                                    .profilePic(user.getProfilePic())
+                            .build());
+                    return response;
+                }).toList();
     }
 
     @PreAuthorize("@postSecurity.isAuthor(#postId, authentication)")

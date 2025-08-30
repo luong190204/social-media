@@ -5,11 +5,14 @@ import com.social.socialmedia.dto.request.PostUpdateRequest;
 import com.social.socialmedia.dto.response.PostResponse;
 import com.social.socialmedia.entity.Post;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface PostMapper {
     Post toPost(PostCreateRequest request);
+
+    @Mapping(target = "author", ignore = true)
     PostResponse toPostResponse(Post post);
     void updatePost(@MappingTarget Post post, PostUpdateRequest request);
 }

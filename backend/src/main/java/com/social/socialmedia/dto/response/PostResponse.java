@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 public class PostResponse {
     private String id;
-    private String authorId;
+    private UserResponse author;
     private String content;
     private List<String> mediaUrls;
     private PostStatus status;

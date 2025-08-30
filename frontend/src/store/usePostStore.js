@@ -6,11 +6,11 @@ export const usePostStore = create((set) => ({
     posts: [],
     isPostsLoading: false,
 
-    getPosts: async () => {
+    fetchPosts: async () => {
         set({ isPostsLoading: true })
         try {
-            const res = await postService.getAllPost();
-            set({ posts: res.data })
+            const res = await postService.getAllPostByUser();
+            set({ posts: res.data.result });
         } catch (error) {
             toast.error("Lỗi khi tải")
         } finally {
