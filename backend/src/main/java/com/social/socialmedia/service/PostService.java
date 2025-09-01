@@ -66,7 +66,7 @@ public class PostService {
     @Autowired
     private CommentMapper commentMapper;
 
-    public PostResponse createPost(PostCreateRequest request, MultipartFile file) {
+    public PostResponse createPost(PostCreateRequest request, MultipartFile[] files) {
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -78,17 +78,18 @@ public class PostService {
         post.setStatus(request.getStatus() != null ? request.getStatus() : PostStatus.ACTIVE);
 
         // Upload ảnh
-        if (file != null && !file.isEmpty()) {
-            String imgUrl = cloudinaryService.uploadFile(file);
+        if (files != null && files.length > 0) {
 
-            if (post.getMediaUrls() == null) {
-                post.setMediaUrls(new ArrayList<>());
+            List<String> uploadUrls = new ArrayList<>();
+
+            for (MultipartFile file: files) {
+                if (!file.isEmpty()) {
+                    String url = cloudinaryService.uploadFile(file);
+                    uploadUrls.add(url);
+                }
             }
-
-            post.getMediaUrls().add(imgUrl);
+            post.setMediaUrls(uploadUrls);
         }
-
-
         return postMapper.toPostResponse(postRepository.save(post));
     }
 

@@ -1,25 +1,30 @@
-import React, { useState } from 'react'
-import { Button } from './ui/button'
-import { Heart, MessageCircle, MoreHorizontal } from 'lucide-react'
+import React, { useState } from "react";
+import { Button } from "../ui/button";
+import { Heart, MessageCircle, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 
 const PortCard = ({ post }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const goToPrevious = () => {
+    const newIndex =
+      currentImageIndex === 0
+        ? post.mediaUrls.length - 1
+        : currentImageIndex - 1;
+    setCurrentImageIndex(newIndex);
+  };
 
-    const goToPrevious = () => {
-        const newIndex = currentImageIndex === 0 ? post.mediaUrls.length - 1 : currentImageIndex - 1;
-        setCurrentImageIndex(newIndex);
-    }
-
-    const goToNext = () => {
-        const newIndex = currentImageIndex === post.mediaUrls.length - 1 ? 0 : currentImageIndex + 1;
-        setCurrentImageIndex(newIndex);
-    }
+  const goToNext = () => {
+    const newIndex =
+      currentImageIndex === post.mediaUrls.length - 1
+        ? 0
+        : currentImageIndex + 1;
+    setCurrentImageIndex(newIndex);
+  };
 
   return (
-    <div className="bg-white shadow rounded-3xl p-4 mb-6">
+    <div className="bg-white shadow rounded-3xl p-4 mb-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -32,9 +37,12 @@ const PortCard = ({ post }) => {
             <span className="font-semibold">{post.author?.username}</span>
             {post.createdAt && (
               <>
-                <span className='text-gray-500 mx-1'>•</span>
-                <span className='text-sm text-gray-500'>
-                    {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: vi })}
+                <span className="text-gray-500 mx-1">•</span>
+                <span className="text-sm text-gray-500">
+                  {formatDistanceToNow(new Date(post.createdAt), {
+                    addSuffix: true,
+                    locale: vi,
+                  })}
                 </span>
               </>
             )}
@@ -123,6 +131,6 @@ const PortCard = ({ post }) => {
       </div>
     </div>
   );
-}
+};
 
-export default PortCard
+export default PortCard;

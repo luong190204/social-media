@@ -21,8 +21,8 @@ public class PostController {
     private PostService postService;
 
     @PostMapping
-    public ApiResponse<PostResponse> createPost(@Valid @RequestBody PostCreateRequest request,
-                                                @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ApiResponse<PostResponse> createPost(@Valid @RequestPart("request") PostCreateRequest request,
+                                                @RequestPart(value = "files", required = false) MultipartFile[] file) {
         return ApiResponse.<PostResponse>builder()
                 .result(postService.createPost(request, file))
                 .build();

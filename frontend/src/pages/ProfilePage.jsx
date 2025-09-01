@@ -1,13 +1,19 @@
-import { usePostStore } from '@/store/usePostStore';
-import { useUserStore } from '@/store/useUserStore'
-import { Camera, Loader, Settings } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import { usePostStore } from "@/store/usePostStore";
+import { useUserStore } from "@/store/useUserStore";
+import { Camera, Loader, Settings } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
-import PostCard from "../components/PortCard";
+import PostCard from "../components/post/PortCard";
+import CreatePost from "@/components/post/CreatePost";
 
 const ProfilePage = () => {
-
-  const { userProfile, isLoadingProfile, fetchMyProfile, isUpdatingProfile, updateAvatar } = useUserStore();
+  const {
+    userProfile,
+    isLoadingProfile,
+    fetchMyProfile,
+    isUpdatingProfile,
+    updateAvatar,
+  } = useUserStore();
   const { posts, isPostsLoading, fetchPosts } = usePostStore();
 
   useEffect(() => {
@@ -16,7 +22,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts])
+  }, [fetchPosts]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -26,8 +32,7 @@ const ProfilePage = () => {
     formData.append("file", file);
 
     await updateAvatar(formData);
-    
-  }
+  };
 
   if (isLoadingProfile) {
     return (
@@ -45,7 +50,7 @@ const ProfilePage = () => {
       </div>
     );
   }
-    
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
@@ -107,6 +112,8 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+      
+      <CreatePost />
 
       <div className="max-w-xl mx-auto mt-6">
         {posts.length > 0 ? (
@@ -117,6 +124,6 @@ const ProfilePage = () => {
       </div>
     </div>
   );
-}
+};
 
-export default ProfilePage
+export default ProfilePage;

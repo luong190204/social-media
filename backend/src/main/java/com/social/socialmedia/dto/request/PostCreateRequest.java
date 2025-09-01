@@ -19,6 +19,5 @@ public class PostCreateRequest {
     @NotBlank(message = "Content cannot be blank")
     @Size(max = 500, message = "Content must be less than 500 characters")
     private String content;
-    private List<String> mediaUrls;
     private PostStatus status; // optional, default ACTIVE
 }

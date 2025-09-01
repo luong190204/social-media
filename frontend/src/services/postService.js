@@ -1,8 +1,12 @@
 import { axiosInstance } from "@/lib/axios"
 
 export const postService = {
-    createPost: async (data, file) => {
-        return await axiosInstance.post("/posts", data, file)
+    createPost: async (formData) => {
+        return await axiosInstance.post("/posts", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+        });
     },
 
     getAllPostByUser: async () => {
