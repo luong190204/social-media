@@ -101,7 +101,9 @@ public class PostService {
     public List<PostResponse> getAllPostByUser() {
         String currentUserId = SecurityUtils.getCurrentUserId();
 
-        return postRepository.findByAuthorId(currentUserId).stream()
+        Sort sortByCreationDateDesc = Sort.by(Sort.Direction.DESC, "createdAt");
+
+        return postRepository.findByAuthorId(currentUserId, sortByCreationDateDesc).stream()
                 .map(post -> {
                     PostResponse response = postMapper.toPostResponse(post);
                     User user = userRepository.findById(post.getAuthorId()).

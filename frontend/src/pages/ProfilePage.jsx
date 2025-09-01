@@ -3,7 +3,7 @@ import { useUserStore } from '@/store/useUserStore'
 import { Camera, Loader, Settings } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 
-import PosTCard from "../components/PortCard";
+import PostCard from "../components/PortCard";
 
 const ProfilePage = () => {
 
@@ -49,7 +49,7 @@ const ProfilePage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
-      <div className="flex items-center gap-10">
+      <div className="flex items-center gap-10 border-b-2">
         {/* avatar upload */}
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
@@ -101,7 +101,7 @@ const ProfilePage = () => {
             </span>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 mb-12">
             <p className="font-medium">{userProfile?.fullName}</p>
             <p className="text-gray-600">{userProfile?.bio}</p>
           </div>
@@ -110,7 +110,7 @@ const ProfilePage = () => {
 
       <div className="max-w-xl mx-auto mt-6">
         {posts.length > 0 ? (
-          posts.map((post) => <PosTCard key={post.id} post={post} />)
+          posts.map((post) => <PostCard key={post.id} post={post} />)
         ) : (
           <p className="text-center">Chưa có bài viết nào.</p>
         )}
