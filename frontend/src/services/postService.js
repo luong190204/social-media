@@ -15,5 +15,12 @@ export const postService = {
 
     getPostById: async (postId) => {
         return await axiosInstance.get("/${postId}")
+    },
+
+    updatePost: async (postId, data) => {
+        const response = await axiosInstance.put(`/posts/${postId}`, data);
+        return {
+          data: response.data.result, 
+        };
     }
 }

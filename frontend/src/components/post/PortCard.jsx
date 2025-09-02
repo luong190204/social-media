@@ -3,9 +3,12 @@ import { Button } from "../ui/button";
 import { Heart, MessageCircle, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
+import PostMoreMenu from "./PostMoreMenu";
 
 const PortCard = ({ post }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const goToPrevious = () => {
     const newIndex =
@@ -49,10 +52,19 @@ const PortCard = ({ post }) => {
           </div>
         </div>
 
-        <Button variant="ghost" className="h-auto ">
+        <Button 
+          onClick={() => setIsMenuOpen(true)}
+          variant="ghost" 
+          className="h-auto ">
           <MoreHorizontal />
         </Button>
       </div>
+
+      <PostMoreMenu 
+        isOpen={isMenuOpen}
+        post={post}
+        onClose={() => setIsMenuOpen(false)}
+      />
 
       {/* Content */}
       {post.content && <p className="mb-3">{post.content}</p>}
@@ -60,12 +72,20 @@ const PortCard = ({ post }) => {
       {/* Media */}
       {post.mediaUrls && post.mediaUrls.length > 0 && (
         <div className="relative w-full rounded-xl overflow-hidden">
-          <div className="relative aspect-square">
-            <img
-              src={post.mediaUrls[currentImageIndex]}
-              alt={`post-media-${currentImageIndex}`}
-              className="absolute inset-0 h-full w-full object-cover rounded-xl"
-            />
+          <div className="w-ful max-h-[600px] flex justify-center items-center bg-black rounded-xl overflow-hidden">
+            {post.mediaUrls[currentImageIndex].match(/\.(mp4|webm|ogg)$/i) ? (
+              <video
+                src={post.mediaUrls[currentImageIndex]}
+                controls
+                className="max-h-[600px] w-auto rounded-xl"
+              />
+            ) : (
+              <img
+                src={post.mediaUrls[currentImageIndex]}
+                alt={`post-media-${currentImageIndex}`}
+                className="max-h-[600px] w-auto rounded-xl"
+              />
+            )}
           </div>
 
           {currentImageIndex > 0 && (
