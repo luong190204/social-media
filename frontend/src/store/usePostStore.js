@@ -7,6 +7,7 @@ export const usePostStore = create((set, get) => ({
   isPostsLoading: false,
   isCreatePostLoading: false,
   isUpdatePostLoading: false,
+  isDeletePostLoading: false,
 
   fetchPosts: async () => {
     set({ isPostsLoading: true });
@@ -60,4 +61,16 @@ export const usePostStore = create((set, get) => ({
       set({ isUpdatePostLoading: false });
     }
   },
+
+  deletePost: async (postId) => {
+    set({ isDeletePostLoading: true })
+    try {
+      await postService.deletePost(postId);
+      toast.success("Xóa bài viết thành công!")
+    } catch (error) {
+      toast.error("Xóa bài viết không thành công!")
+    } finally {
+      set({ isDeletePostLoading: true })
+    }
+  }
 }));

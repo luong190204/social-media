@@ -1,9 +1,12 @@
 import { usePostStore } from '@/store/usePostStore';
 import { ChevronLeft, ChevronRight, Loader2, Play, X } from 'lucide-react';
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const UpdatePostForm = ({ post, onClose }) => {
+    
+    //const navigate = useNavigate();
 
     const { updatePost, isUpdatePostLoading } = usePostStore();
     const [content, setContent] = useState(post?.content || '');
@@ -32,6 +35,11 @@ const UpdatePostForm = ({ post, onClose }) => {
             setCurrentMediaIndex(currentMediaIndex - 1);
         }
     };
+
+    // TODO: update thêm chuyển về post chi tiết
+    // const handleClose = () => {
+    //   navigate(`/posts/${post.id}`);
+    // }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50 p-4">

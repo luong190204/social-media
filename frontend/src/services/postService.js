@@ -22,5 +22,9 @@ export const postService = {
         return {
           data: response.data.result, 
         };
+    },
+
+    deletePost: async (postId) => {
+        return await axiosInstance.delete(`/posts/${postId}`);
     }
 }

@@ -1,9 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 import UpdatePostForm from './UpdatePostForm ';
+import DeletePost from './DeletePost';
 
-const PostMoreMenu = ({ post, isOpen, onClose, onDelete }) => {
-    const [openUpdate, setOpenUpdate] = useState(false);
+const PostMoreMenu = ({ post, isOpen, onClose }) => {
+    const [openUpdate, setOpenUpdate] = useState(false);  
+    const [openDelete, setOpenDelete] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -29,7 +31,7 @@ const PostMoreMenu = ({ post, isOpen, onClose, onDelete }) => {
             className="bg-white w-80 rounded-2xl overflow-hidden shadow-lg z-50"
           >
             <button
-              onClick={onDelete}
+              onClick={() => setOpenDelete(true)}
               className="w-full py-4 text-red-500 font-semibold border-b hover:bg-gray-50"
             >
               Xóa bài viết
@@ -58,6 +60,8 @@ const PostMoreMenu = ({ post, isOpen, onClose, onDelete }) => {
 
       {openUpdate && 
         <UpdatePostForm post={post} onClose={() => setOpenUpdate(false)}/>}
+
+      {openDelete && <DeletePost post={post}/>}
     </AnimatePresence>
   );
 }
