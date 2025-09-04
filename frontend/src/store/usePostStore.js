@@ -63,14 +63,34 @@ export const usePostStore = create((set, get) => ({
   },
 
   deletePost: async (postId) => {
-    set({ isDeletePostLoading: true })
+    set({ isDeletePostLoading: true });
     try {
       await postService.deletePost(postId);
-      toast.success("Xóa bài viết thành công!")
+
+      set((state) => ({
+        posts: state.posts.filter((p) => p.id !== postId),
+      }));
+
+      toast.success("Xóa bài viết thành công!");
     } catch (error) {
-      toast.error("Xóa bài viết không thành công!")
+      toast.error("Xóa bài viết không thành công!");
     } finally {
-      set({ isDeletePostLoading: true })
+      set({ isDeletePostLoading: false });
     }
-  }
+  },
+
+  toggleLikePost: async (postId) => {
+    try {
+      const res = await postService.toggleLikePost(postId);
+      const { postId: id, totalLikes, likeByMe } = res.data.result;
+
+      set((state) => ({
+        posts: state.posts.map((p) =>
+          p.id === id ? { ...p, totalLikes, likeByMe: likeByMe } : p
+        ),
+      }));
+    } catch (error) {
+      throw error;
+    }
+  },
 }));

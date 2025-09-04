@@ -1,11 +1,12 @@
 import { usePostStore } from '@/store/usePostStore';
+import { Loader2 } from 'lucide-react';
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const DeletePost = ({ post, onClose }) => {
 
-    const 
-
+    const navigate = useNavigate(); 
     const { deletePost, isDeletePostLoading } = usePostStore();
  
     const handleSubmit = async (e) => {
@@ -13,6 +14,7 @@ const DeletePost = ({ post, onClose }) => {
 
         try {
             await deletePost(post.id)
+            navigate("/profile");
         } catch (error) {
             toast.error("Xóa bài viết thất bại!")
         }
@@ -28,11 +30,24 @@ const DeletePost = ({ post, onClose }) => {
           </p>
         </div>
 
-        <button className="w-full py-3 text-red-500 font-bold hover:hover:bg-gray-50 transition border-b ">
-          Xóa bỏ
+        <button
+          onClick={handleSubmit}
+          className="w-full py-3 text-red-500 font-bold hover:hover:bg-gray-50 transition border-b flex items-center justify-center gap-2"
+        >
+          {isDeletePostLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Delete...
+            </>
+          ) : (
+            "Xóa bỏ"
+          )}
         </button>
 
-        <button className="w-full py-3 font-medium hover:hover:bg-gray-50 transition">
+        <button
+          onClick={onClose}
+          className="w-full py-3 font-medium hover:hover:bg-gray-50 transition"
+        >
           Hủy bỏ
         </button>
       </div>

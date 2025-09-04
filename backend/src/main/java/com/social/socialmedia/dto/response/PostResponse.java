@@ -19,6 +19,10 @@ public class PostResponse {
     private String content;
     private List<String> mediaUrls;
     private PostStatus status;
+
+    private int totalLikes;
+    private boolean likedByMe;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

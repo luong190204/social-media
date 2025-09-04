@@ -4,8 +4,12 @@ import { Heart, MessageCircle, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import PostMoreMenu from "./PostMoreMenu";
+import LikeButton from "./LikeButton";
+import { usePostStore } from "@/store/usePostStore";
 
 const PortCard = ({ post }) => {
+
+  const toggleLike = usePostStore((state) => state.toggleLikePost);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,15 +56,16 @@ const PortCard = ({ post }) => {
           </div>
         </div>
 
-        <Button 
+        <Button
           onClick={() => setIsMenuOpen(true)}
-          variant="ghost" 
-          className="h-auto ">
+          variant="ghost"
+          className="h-auto "
+        >
           <MoreHorizontal />
         </Button>
       </div>
 
-      <PostMoreMenu 
+      <PostMoreMenu
         isOpen={isMenuOpen}
         post={post}
         onClose={() => setIsMenuOpen(false)}
@@ -136,17 +141,36 @@ const PortCard = ({ post }) => {
 
       {/* Footer */}
       <div className="flex items-center  text-gray-600">
-        <Button
-          variant="outline"
-          className="flex items-center gap-1 hover:text-red-500 border-none [&_svg]:!w-6 [&_svg]:!h-6 px-0 py-0"
-        >
-          <Heart />
-        </Button>
+        <LikeButton
+          postId={post.id}
+          initialCount={post.totalLikes}
+          initialLiked={post.likedByMe}
+          onToggle={async () => {
+            await toggleLike(post.id);
+          }}
+        />
         <Button
           variant="outline"
           className="flex items-center gap-1 hover:text-blue-500 border-none [&_svg]:!w-6 [&_svg]:!h-6 "
         >
-          <MessageCircle />
+          <svg
+            aria-label="Comment"
+            class="x1lliihq x1n2onr6 x5n08af"
+            fill="currentColor"
+            height="24"
+            role="img"
+            viewBox="0 0 24 24"
+            width="24"
+          >
+            <title>Comment</title>
+            <path
+              d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-linejoin="round"
+              stroke-width="2"
+            ></path>
+          </svg>
         </Button>
       </div>
     </div>

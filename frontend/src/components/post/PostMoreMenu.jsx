@@ -58,10 +58,13 @@ const PostMoreMenu = ({ post, isOpen, onClose }) => {
         </div>
       )}
 
-      {openUpdate && 
-        <UpdatePostForm post={post} onClose={() => setOpenUpdate(false)}/>}
+      {openUpdate && (
+        <UpdatePostForm post={post} onClose={() => setOpenUpdate(false)} />
+      )}
 
-      {openDelete && <DeletePost post={post}/>}
+      {openDelete && (
+        <DeletePost post={post} onClose={() => setOpenDelete(false)} />
+      )}
     </AnimatePresence>
   );
 }

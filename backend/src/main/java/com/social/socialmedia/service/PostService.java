@@ -114,6 +114,12 @@ public class PostService {
                                     .username(user.getUsername())
                                     .profilePic(user.getProfilePic())
                             .build());
+
+                    int totalLikes = postLikeRepository.countByPostId(post.getId());
+                    boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId);
+
+                    response.setTotalLikes(totalLikes);
+                    response.setLikedByMe(likedByMe);
                     return response;
                 }).toList();
     }

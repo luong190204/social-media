@@ -26,5 +26,9 @@ export const postService = {
 
     deletePost: async (postId) => {
         return await axiosInstance.delete(`/posts/${postId}`);
+    },
+
+    toggleLikePost: async (postId) => {
+        return await axiosInstance.post(`/posts/${postId}/like`)
     }
 }
