@@ -6,6 +6,7 @@ import { vi } from "date-fns/locale";
 import PostMoreMenu from "./PostMoreMenu";
 import LikeButton from "./LikeButton";
 import { usePostStore } from "@/store/usePostStore";
+import CommentDialog from "./CommentDialog";
 
 const PortCard = ({ post }) => {
 
@@ -13,6 +14,8 @@ const PortCard = ({ post }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const [openComment, setOpenComment] = useState(false);
 
   const goToPrevious = () => {
     const newIndex =
@@ -152,6 +155,7 @@ const PortCard = ({ post }) => {
         <Button
           variant="outline"
           className="flex items-center gap-1 hover:text-blue-500 border-none [&_svg]:!w-6 [&_svg]:!h-6 "
+          onClick={() => setOpenComment(true)}
         >
           <svg
             aria-label="Comment"
@@ -172,6 +176,8 @@ const PortCard = ({ post }) => {
             ></path>
           </svg>
         </Button>
+
+        <CommentDialog post={post} open={openComment} onClose={() => setOpenComment(false)}/>
       </div>
     </div>
   );
