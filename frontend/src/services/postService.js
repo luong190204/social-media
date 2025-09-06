@@ -30,5 +30,14 @@ export const postService = {
 
     toggleLikePost: async (postId) => {
         return await axiosInstance.post(`/posts/${postId}/like`)
-    }
+    },
+
+    commentPost: async (postId, data) => {
+      const response = await axiosInstance.post(`/posts/${postId}/comment`, data);
+      return response.data.result; // comment mới
+    },
+
+    fetchCommentByPost: async (postId) => {
+        return await axiosInstance.get(`/posts/${postId}/comments`);
+    },
 }

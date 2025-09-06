@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent } from '../ui/dialog'
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
+import { useCommentStore } from '@/store/useCommentStore ';
+import CommentList from './CommentList';
 
 const CommentDialog = ({ post, open, onClose }) => {
 
+    const { commentsByPost, isCommentPostLoading, fetchCommentByPost } =
+      useCommentStore();
     const [mediaUrls, setMediaUrls] = useState(post?.mediaUrls || "");
     const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
     const [input, setInput] = useState("");
@@ -22,6 +25,10 @@ const CommentDialog = ({ post, open, onClose }) => {
             setCurrentMediaIndex(currentMediaIndex - 1);
         }
     }  
+
+    useEffect(() => {
+      fetchCommentByPost(post.id);
+    }, [post.id]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -123,12 +130,8 @@ const CommentDialog = ({ post, open, onClose }) => {
             <p>{post?.content}</p>
           </div>
 
-          <ScrollArea className="flex-1 p-3">
-            {/* Fake comments để test UI */}
-            <div className="mb-2">
-              <span className="font-semibold">user1</span> comment demo 1
-            </div>
-          </ScrollArea>
+          {/* comment list */}
+          <CommentList comments={commentsByPost[post.id] || []}/>
 
           <div className="border-t flex items-center p-3 gap-2">
             <input
@@ -141,6 +144,10 @@ const CommentDialog = ({ post, open, onClose }) => {
             <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
               Gửi
             </Button>
+            <button onClick={() => console.log("comment: ", comments)
+            }>
+              CLick
+            </button>
           </div>
         </div>
       </DialogContent>
