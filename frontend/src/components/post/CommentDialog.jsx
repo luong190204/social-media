@@ -3,16 +3,25 @@ import { Dialog, DialogContent } from '../ui/dialog'
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
 import { useCommentStore } from '@/store/useCommentStore ';
 import CommentList from './CommentList';
+import { toast } from 'sonner';
 
 const CommentDialog = ({ post, open, onClose }) => {
 
-    const { commentsByPost, isCommentPostLoading, fetchCommentByPost } =
-      useCommentStore();
+    const {
+      commentsByPost,
+      isCommentPostLoading,
+      fetchCommentByPost,
+      commentPost,
+    } = useCommentStore();
+
+    
     const [mediaUrls, setMediaUrls] = useState(post?.mediaUrls || "");
     const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-    const [input, setInput] = useState("");
+    const [content, setContent] = useState("");
 
     const nextMedia = () => {
         if (currentMediaIndex < mediaUrls.length - 1) {
@@ -29,6 +38,23 @@ const CommentDialog = ({ post, open, onClose }) => {
     useEffect(() => {
       fetchCommentByPost(post.id);
     }, [post.id]);
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (!content.trim()) {
+        return;
+      }
+
+      try {
+        await commentPost(post.id, { content });
+
+        setContent("");
+      } catch (error) {
+        toast.error("Có lỗi xảy ra khi bình luận!");
+        console.error("Create post error:", error);
+      }
+    } 
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -116,7 +142,7 @@ const CommentDialog = ({ post, open, onClose }) => {
 
         {/* right */}
         <div className="w-1/2 flex flex-col">
-          <div className="flex items-center gap-2 border-b p-3">
+          <div className="flex items-center gap-2 border-b pt-3 px-3">
             <Avatar className="h-8 w-8">
               <AvatarImage src={post?.author?.profilePic} />
               <AvatarFallback>{post?.author?.username?.[0]}</AvatarFallback>
@@ -124,6 +150,15 @@ const CommentDialog = ({ post, open, onClose }) => {
             <span className="font-semibold text-sm pl-1">
               {post?.author?.username}
             </span>
+            <div className="text-gray-500 text-xs pt-1">
+              <span className="text-gray-500 mx-1 pr-1">•</span>
+              <span>
+                {formatDistanceToNow(new Date(post.createdAt), {
+                  addSuffix: true,
+                  locale: vi,
+                })}
+              </span>
+            </div>
           </div>
 
           <div className="p-3 border-b">
@@ -131,23 +166,22 @@ const CommentDialog = ({ post, open, onClose }) => {
           </div>
 
           {/* comment list */}
-          <CommentList comments={commentsByPost[post.id] || []}/>
+          <CommentList comments={commentsByPost[post.id] || []} />
 
           <div className="border-t flex items-center p-3 gap-2">
             <input
               type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               placeholder="Viết bình luận..."
               className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none"
             />
-            <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
+            <Button 
+              size="sm" className="bg-blue-500 hover:bg-blue-600"
+                onClick={handleSubmit}
+            >
               Gửi
             </Button>
-            <button onClick={() => console.log("comment: ", comments)
-            }>
-              CLick
-            </button>
           </div>
         </div>
       </DialogContent>

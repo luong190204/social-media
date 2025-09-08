@@ -18,7 +18,6 @@ public class CommentResponse {
     private String userId;
     private String content;
     private String parentId;
-
     // optional
     private String authorName;   // lấy từ user
     private String authorAvatar;
@@ -27,5 +26,4 @@ public class CommentResponse {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

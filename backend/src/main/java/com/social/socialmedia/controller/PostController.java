@@ -76,7 +76,7 @@ public class PostController {
     public ApiResponse<Page<CommentResponse>> getCommentsByPost(
             @PathVariable String postId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "8") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
 
         Page<CommentResponse> comments = postService.getCommentByPost(postId, page, size, sort);
@@ -90,7 +90,7 @@ public class PostController {
     public ApiResponse<Page<CommentResponse>> getRepliesByComment(
             @PathVariable String commentId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "2") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
 
         Page<CommentResponse> replies = postService.getRepliesByComment(commentId, page, size, sort);

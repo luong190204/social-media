@@ -33,11 +33,14 @@ export const postService = {
     },
 
     commentPost: async (postId, data) => {
-      const response = await axiosInstance.post(`/posts/${postId}/comment`, data);
-      return response.data.result; // comment mới
+      return await axiosInstance.post(`/posts/${postId}/comment`, data);
     },
 
     fetchCommentByPost: async (postId) => {
         return await axiosInstance.get(`/posts/${postId}/comments`);
     },
+
+    fetchRepliesByComment: async(commentId) => {
+        return await axiosInstance.get(`/posts/comments/${commentId}/replies`);
+    }
 }

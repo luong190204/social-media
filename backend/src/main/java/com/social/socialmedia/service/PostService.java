@@ -189,6 +189,7 @@ public class PostService {
         // Map sang response
         CommentResponse response = commentMapper.toCommentResponse(commentPostRepository.save(comment));
         response.setAuthorName(user.getUsername());
+        response.setAuthorAvatar(user.getProfilePic());
 
         return response;
     }
