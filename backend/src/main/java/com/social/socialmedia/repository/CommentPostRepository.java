@@ -12,4 +12,6 @@ public interface CommentPostRepository extends MongoRepository<Comment, String> 
     Page<Comment> findByParentId(String parentId, Pageable pageable);
 
     void deleteByParentId(String parentId);
+
+    Long countByParentId(String parentId);
 }

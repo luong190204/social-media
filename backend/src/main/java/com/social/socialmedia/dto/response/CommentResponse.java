@@ -22,7 +22,7 @@ public class CommentResponse {
     private String authorName;   // lấy từ user
     private String authorAvatar;
 
-    private List<CommentResponse> replies; // danh sách reply
+    private Long countReplies; // danh sách reply
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -230,6 +230,9 @@ public class PostService {
 
         response.setAuthorName(author.getUsername());
         response.setAuthorAvatar(author.getProfilePic());
+        Long replyCount = commentPostRepository.countByParentId(comment.getId());
+
+        response.setCountReplies(replyCount);
 
         return response;
     }

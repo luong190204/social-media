@@ -33,12 +33,8 @@ const CommentDialog = ({ post, open, onClose }) => {
         if (currentMediaIndex > 0) {
             setCurrentMediaIndex(currentMediaIndex - 1);
         }
-    }  
-
-    useEffect(() => {
-      fetchCommentByPost(post.id);
-    }, [post.id]);
-
+    }
+    
     const handleSubmit = async (e) => {
       e.preventDefault();
 
@@ -147,6 +143,7 @@ const CommentDialog = ({ post, open, onClose }) => {
               <AvatarImage src={post?.author?.profilePic} />
               <AvatarFallback>{post?.author?.username?.[0]}</AvatarFallback>
             </Avatar>
+
             <span className="font-semibold text-sm pl-1">
               {post?.author?.username}
             </span>
@@ -166,7 +163,10 @@ const CommentDialog = ({ post, open, onClose }) => {
           </div>
 
           {/* comment list */}
-          <CommentList comments={commentsByPost[post.id] || []} />
+          <CommentList
+            comments={commentsByPost[post.id] || []}
+            postId={post.id}
+          />
 
           <div className="border-t flex items-center p-3 gap-2">
             <input
@@ -176,9 +176,10 @@ const CommentDialog = ({ post, open, onClose }) => {
               placeholder="Viết bình luận..."
               className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none"
             />
-            <Button 
-              size="sm" className="bg-blue-500 hover:bg-blue-600"
-                onClick={handleSubmit}
+            <Button
+              size="sm"
+              className="bg-blue-500 hover:bg-blue-600"
+              onClick={handleSubmit}
             >
               Gửi
             </Button>

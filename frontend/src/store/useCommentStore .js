@@ -6,18 +6,29 @@ export const useCommentStore = create((set) => ({
   commentsByPost: {}, // {"postId: [comments...], ...."}
   repliesByComment: {},
   isCommentLoading: false,
+  isRepliesLoading: false,
 
-  fetchCommentByPost: async (postId) => {
-    set({ isCommentPostLoading: true });
+  fetchCommentByPost: async (postId, page = 0, size = 8) => {
+    set({ isCommentLoading: true });
 
     try {
       const res = await postService.fetchCommentByPost(postId);
-      set((state) => ({
-        commentsByPost: {
-          ...state.commentsByPost,
-          [postId]: res.data.result.content,
-        },
-      }));
+      const newComments = res.data.result.content;
+
+      set((state) => {
+        const prevComments = state.commentsByPost[postId] || [];
+
+        return {
+          commentsByPost: {
+            ...state.commentsByPost,
+            [postId]:
+              page === 0 ? newComments : [...prevComments, ...newComments], // gộp thêm
+          },
+          isCommentLoading: false,
+        };
+      });
+      
+      return res.data.result;
     } catch (error) {
       toast.error("Lỗi khi tải");
       set({ isCommentLoading: false });
@@ -48,23 +59,24 @@ export const useCommentStore = create((set) => ({
   },
 
   fetchRepliesByComment: async (commentId) => {
-    console.log("Fetching replies for commentId:", commentId);
+    set({ isRepliesLoading: true });
+
     try {
       const res = await postService.fetchRepliesByComment(commentId);
-      console.log("Check res:", res); // log toàn bộ
-      console.log("Check res.data:", res.data.result);
-      set((state) => ({
-        repliesByComment: {
+      set((state) => {
+        const newState = {
           ...state.repliesByComment,
           [commentId]: {
-            items: res.data.result.content || [],
-            total: res.data.result.totalElements || 0,
+            items: res.data.result.content,
           },
-        },
-      }));
+        };
+        return { repliesByComment: newState };
+      });
     } catch (error) {
       console.error("Lỗi khi fetch replies:", error);
+      set({ isRepliesLoading: false });
+    } finally {
+      set({ isRepliesLoading: false });
     }
   },
-  
 }));
