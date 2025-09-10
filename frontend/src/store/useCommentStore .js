@@ -12,7 +12,7 @@ export const useCommentStore = create((set) => ({
     set({ isCommentLoading: true });
 
     try {
-      const res = await postService.fetchCommentByPost(postId);
+      const res = await postService.fetchCommentByPost(postId, page, size);
       const newComments = res.data.result.content;
 
       set((state) => {
@@ -79,4 +79,28 @@ export const useCommentStore = create((set) => ({
       set({ isRepliesLoading: false });
     }
   },
+
+  updateComment: async (commentId, data) => {
+    try {
+      const res = postService.updateComment(commentId, data);
+      set((state) => {
+        const updated = res.data.result;
+        const newMap = { ...state.commentsByPost };
+
+        Object.keys(newMap).forEach((postId) => {
+          newMap[postId] = newMap[postId].map((c) => 
+            c.id === commentId ? updated : c
+          );
+        });
+
+         return { commentsByPost: newMap };
+      })
+      toast.success("Cập nhật bình luận thành công");
+      return res.data.result;
+    } catch (error) {
+      toast.error("Cập nhật bình luận thất bại");
+    }
+  }
+
+
 }));

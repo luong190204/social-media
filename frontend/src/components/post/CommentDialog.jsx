@@ -8,20 +8,16 @@ import { vi } from "date-fns/locale";
 import { useCommentStore } from '@/store/useCommentStore ';
 import CommentList from './CommentList';
 import { toast } from 'sonner';
+import CommentInput from './CommentInput';
 
 const CommentDialog = ({ post, open, onClose }) => {
 
-    const {
-      commentsByPost,
-      isCommentPostLoading,
-      fetchCommentByPost,
-      commentPost,
-    } = useCommentStore();
+    const { commentsByPost } = useCommentStore();
 
     
     const [mediaUrls, setMediaUrls] = useState(post?.mediaUrls || "");
     const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-    const [content, setContent] = useState("");
+    const [editingComment, setEditingComment] = useState(null);
 
     const nextMedia = () => {
         if (currentMediaIndex < mediaUrls.length - 1) {
@@ -35,22 +31,7 @@ const CommentDialog = ({ post, open, onClose }) => {
         }
     }
     
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-
-      if (!content.trim()) {
-        return;
-      }
-
-      try {
-        await commentPost(post.id, { content });
-
-        setContent("");
-      } catch (error) {
-        toast.error("Có lỗi xảy ra khi bình luận!");
-        console.error("Create post error:", error);
-      }
-    } 
+    
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -166,24 +147,14 @@ const CommentDialog = ({ post, open, onClose }) => {
           <CommentList
             comments={commentsByPost[post.id] || []}
             postId={post.id}
+            onEditComment={(c) => setEditingComment(c)}
           />
 
-          <div className="border-t flex items-center p-3 gap-2">
-            <input
-              type="text"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Viết bình luận..."
-              className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none"
-            />
-            <Button
-              size="sm"
-              className="bg-blue-500 hover:bg-blue-600"
-              onClick={handleSubmit}
-            >
-              Gửi
-            </Button>
-          </div>
+          <CommentInput 
+            postId={post.id}
+            editingComment={editingComment}
+            onSubmitSuccess={() => setEditingComment(null)}
+          />
         </div>
       </DialogContent>
     </Dialog>

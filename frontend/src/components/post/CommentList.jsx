@@ -4,10 +4,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useCommentStore } from '@/store/useCommentStore ';
-import { Loader, Loader2 } from 'lucide-react';
+import { Loader, MoreHorizontal, Plus } from 'lucide-react';
+import CommentMoreMenu from './CommentMoreMenu';
 
-const CommentList = ({ postId, comments }) => {
-
+const CommentList = ({ postId, comments, onEditComment }) => {
   const {
     repliesByComment,
     fetchCommentByPost,
@@ -15,14 +15,17 @@ const CommentList = ({ postId, comments }) => {
     isRepliesLoading,
     isCommentLoading,
   } = useCommentStore();
-  
+
   const [openReplies, setOpenReplies] = useState({});
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
 
+  const [openMenuId, setOpenMenuId] = useState(null); // id cmt đang mở menu
+
   useEffect(() => {
     fetchCommentByPost(postId, 0).then((res) => {
       setTotalPages(res.totalPages);
+      setPage(0);
     });
   }, [postId]);
 
@@ -34,18 +37,20 @@ const CommentList = ({ postId, comments }) => {
     }
 
     setOpenReplies((prev) => ({
-      ...prev, [commentId]: !isOpen,
+      ...prev,
+      [commentId]: !isOpen,
     }));
-  }
+  };
 
-  const handleLoadMore = () => {
-    if (page + 1 < totalPages) {
-      const nextPage = page + 1;
-      fetchCommentByPost(postId, nextPage).then((res) => {
-        setPage(nextPage);
-      });
+  const handleLoadMore = async () => {
+    const nextPage = page + 1;
+    const res = await fetchCommentByPost(postId, nextPage, 8);
+
+    if (res) {
+      setPage(nextPage);
+      setTotalPages(res.totalPages);
     }
-  }
+  };
 
   if (isCommentLoading) {
     return (
@@ -54,8 +59,6 @@ const CommentList = ({ postId, comments }) => {
       </div>
     );
   }
-
-  
 
   return (
     <ScrollArea className="flex-1 p-4 space-y-4 overflow-y-auto">
@@ -69,7 +72,7 @@ const CommentList = ({ postId, comments }) => {
 
         return (
           <div key={cmt.id} className="space-y-2">
-            <div className="flex items-start space-x-3 space-y-3">
+            <div className="flex items-start space-x-3 mb-4">
               <Avatar className="w-8 h-8 flex-shrink-0">
                 <AvatarImage src={cmt.authorAvatar} alt={cmt.authorName} />
                 <AvatarFallback className="bg-gray-200 text-gray-600 text-xs font-medium">
@@ -77,7 +80,7 @@ const CommentList = ({ postId, comments }) => {
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 ">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="font-semibold text-sm text-gray-900">
                     {cmt.authorName}
@@ -97,6 +100,24 @@ const CommentList = ({ postId, comments }) => {
                   <button className="text-xs text-gray-500 font-medium hover:text-gray-700 transition-colors">
                     Phản hồi
                   </button>
+
+                  <button
+                    onClick={() =>
+                      setOpenMenuId(openMenuId === cmt.id ? null : cmt.id)
+                    }
+                    className="p-1 rounded-full hover:bg-gray-200"
+                  >
+                    <MoreHorizontal className="w-4 h-4 " />
+                  </button>
+
+                  {/* Dropdown menu */}
+                  {openMenuId === cmt.id && (
+                    <CommentMoreMenu
+                      isOpen={true}
+                      onClose={() => setOpenMenuId(null)}
+                      onEdit={() => onEditComment(cmt)}
+                    />
+                  )}
                 </div>
 
                 {totalReplies > 0 && (
@@ -166,15 +187,17 @@ const CommentList = ({ postId, comments }) => {
       })}
 
       {page + 1 < totalPages && (
-        <button
-          onClick={handleLoadMore}
-          className="text-blue-500 hover:underline mt-2"
-        >
-          + Xem thêm
-        </button>
+        <div className="flex justify-center my-8">
+          <button
+            onClick={handleLoadMore}
+            className="text-gray-800  mt-2 border-2 border-gray-600 rounded-full p-1"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
       )}
     </ScrollArea>
   );
-}
+};
 
 export default CommentList

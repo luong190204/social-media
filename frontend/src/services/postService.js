@@ -36,11 +36,17 @@ export const postService = {
       return await axiosInstance.post(`/posts/${postId}/comment`, data);
     },
 
-    fetchCommentByPost: async (postId) => {
-        return await axiosInstance.get(`/posts/${postId}/comments`);
+    fetchCommentByPost: async (postId, page = 0, size = 8) => {
+        return await axiosInstance.get(`/posts/${postId}/comments`, {
+            params: { page, size },
+        });
     },
 
     fetchRepliesByComment: async(commentId) => {
         return await axiosInstance.get(`/posts/comments/${commentId}/replies`);
+    },
+
+    updateComment: async (commentId, data) => {
+        return await axiosInstance.put(`/posts/comments/${commentId}`, data)
     }
 }
