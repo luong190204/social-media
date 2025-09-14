@@ -22,7 +22,7 @@ const CommentInput = ({ postId, editingComment, onSubmitSuccess }) => {
 
       try {
         if (editingComment) {
-            await updateComment(postId, { content });
+            await updateComment(editingComment.id , { content });
         } else {
             await commentPost(postId, { content });
         }
@@ -51,6 +51,11 @@ const CommentInput = ({ postId, editingComment, onSubmitSuccess }) => {
       >
         {editingComment ? "Cập nhật" : "Gửi"}
       </Button>
+
+      <button onClick={() => console.log("cmt: ", editingComment)
+      }>
+        click
+      </button>
     </div>
   );
 }

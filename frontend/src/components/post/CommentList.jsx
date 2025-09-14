@@ -6,6 +6,7 @@ import { vi } from "date-fns/locale";
 import { useCommentStore } from '@/store/useCommentStore ';
 import { Loader, MoreHorizontal, Plus } from 'lucide-react';
 import CommentMoreMenu from './CommentMoreMenu';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const CommentList = ({ postId, comments, onEditComment }) => {
   const {
@@ -15,6 +16,8 @@ const CommentList = ({ postId, comments, onEditComment }) => {
     isRepliesLoading,
     isCommentLoading,
   } = useCommentStore();
+
+  const { authUser } = useAuthStore();
 
   const [openReplies, setOpenReplies] = useState({});
   const [totalPages, setTotalPages] = useState(0);
@@ -116,6 +119,7 @@ const CommentList = ({ postId, comments, onEditComment }) => {
                       isOpen={true}
                       onClose={() => setOpenMenuId(null)}
                       onEdit={() => onEditComment(cmt)}
+                      canEdit={cmt.userId === authUser.id}
                     />
                   )}
                 </div>
@@ -144,7 +148,7 @@ const CommentList = ({ postId, comments, onEditComment }) => {
             </div>
 
             {showReplies && replies.length > 0 && (
-              <div className="ml-11 space-y-2">
+              <div className="ml-11 space-y-2 pb-4">
                 {replies.map((reply) => (
                   <div key={reply.id} className="flex items-start space-x-3">
                     <Avatar className="w-6 h-6 flex-shrink-0">

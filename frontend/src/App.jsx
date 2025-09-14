@@ -17,8 +17,6 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
-  console.log("Auth user: ", authUser);
-
   // Hiển thị Loader nếu đang trong quá trình kiểm tra
   if (isCheckingAuth) {
     return (
