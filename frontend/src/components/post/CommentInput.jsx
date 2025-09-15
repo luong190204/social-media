@@ -14,7 +14,6 @@ const CommentInput = ({ postId, editingComment, onSubmitSuccess }) => {
     }, [editingComment])
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
 
       if (!content.trim()) {
         return;
@@ -51,11 +50,6 @@ const CommentInput = ({ postId, editingComment, onSubmitSuccess }) => {
       >
         {editingComment ? "Cập nhật" : "Gửi"}
       </Button>
-
-      <button onClick={() => console.log("cmt: ", editingComment)
-      }>
-        click
-      </button>
     </div>
   );
 }

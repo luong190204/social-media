@@ -47,6 +47,10 @@ export const postService = {
     },
 
     updateComment: async (commentId, data) => {
-        return await axiosInstance.put(`/posts/comments/${commentId}`, data)
+        return await axiosInstance.put(`/posts/comments/${commentId}`, data);
+    },
+
+    deleteComment: async(commentId) => {
+        return await axiosInstance.delete(`/posts/comments/${commentId}`);
     }
 }

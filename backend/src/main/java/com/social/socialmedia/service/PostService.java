@@ -263,7 +263,15 @@ public class PostService {
         comment.setUpdatedAt(LocalDateTime.now());
 
         commentPostRepository.save(comment);
-        return commentMapper.toCommentResponse(comment);
+
+        User user = userRepository.findById(comment.getUserId()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        CommentResponse response = commentMapper.toCommentResponse(comment);
+
+        response.setAuthorName(user.getUsername());
+        response.setAuthorAvatar(user.getProfilePic());
+
+        return response;
     }
 
     @Transactional

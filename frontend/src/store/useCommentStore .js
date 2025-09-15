@@ -82,25 +82,43 @@ export const useCommentStore = create((set) => ({
 
   updateComment: async (commentId, data) => {
     try {
-      const res = postService.updateComment(commentId, data);
+      const res = await postService.updateComment(commentId, data);
       set((state) => {
         const updated = res.data.result;
         const newMap = { ...state.commentsByPost };
 
+        // Vòng lặp map tìm kiếm bình luận có ID khớp và thay thế nó bằng dữ liệu mới nhất từ server.
+        // lấy ra newMap bằng object key -> duyệt qua postId trong newMap -> nếu id cmt trùng viiuws commentId -> update
         Object.keys(newMap).forEach((postId) => {
           newMap[postId] = newMap[postId].map((c) => 
             c.id === commentId ? updated : c
           );
         });
 
-         return { commentsByPost: newMap };
+        return { commentsByPost: newMap };
       })
       toast.success("Cập nhật bình luận thành công");
       return res.data.result;
     } catch (error) {
       toast.error("Cập nhật bình luận thất bại");
     }
-  }
+  },
 
+  deleteComment: async (postId, commentId) => {
+    try {
+      await postService.deleteComment(commentId);      
+
+      set((state) => ({
+        commentsByPost: {
+          ...state.commentsByPost,
+          [postId]: state.commentsByPost[postId].filter((c) => c.id !== commentId),
+        }
+      }));
+
+      toast.success("Xóa bình luận thành công")
+    } catch (error) {
+      toast.error("Xóa bình luận thất bại")  
+    }
+  },
 
 }));

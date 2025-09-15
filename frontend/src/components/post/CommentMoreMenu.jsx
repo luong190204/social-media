@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import React from 'react'
 
-const CommentMoreMenu = ({ isOpen, onClose, onEdit, canEdit, onDelete }) => {
+const CommentMoreMenu = ({ isOpen, onClose, onEdit, canEdit, onDelete, canDelete }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -13,12 +13,17 @@ const CommentMoreMenu = ({ isOpen, onClose, onEdit, canEdit, onDelete }) => {
             exit={{ opacity: 0, y: 30 }}
             className="bg-white w-80 rounded-2xl overflow-hidden shadow-lg z-50"
           >
-            <button
-              onClick={() => {}}
-              className="w-full py-4 text-red-500 font-semibold border-b hover:bg-gray-50"
-            >
-              Xóa bình luận
-            </button>
+            {canDelete && (
+              <button
+                onClick={() => {
+                  onDelete();
+                  onClose();
+                }}
+                className="w-full py-4 text-red-500 font-semibold border-b hover:bg-gray-50"
+              >
+                Xóa bình luận
+              </button>
+            )}
 
             {canEdit && (
               <button

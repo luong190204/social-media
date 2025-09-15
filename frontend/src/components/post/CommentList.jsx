@@ -8,13 +8,14 @@ import { Loader, MoreHorizontal, Plus } from 'lucide-react';
 import CommentMoreMenu from './CommentMoreMenu';
 import { useAuthStore } from '@/store/useAuthStore';
 
-const CommentList = ({ postId, comments, onEditComment }) => {
+const CommentList = ({ post, comments, onEditComment }) => {
   const {
     repliesByComment,
     fetchCommentByPost,
     fetchRepliesByComment,
     isRepliesLoading,
     isCommentLoading,
+    deleteComment,
   } = useCommentStore();
 
   const { authUser } = useAuthStore();
@@ -26,11 +27,11 @@ const CommentList = ({ postId, comments, onEditComment }) => {
   const [openMenuId, setOpenMenuId] = useState(null); // id cmt đang mở menu
 
   useEffect(() => {
-    fetchCommentByPost(postId, 0).then((res) => {
+    fetchCommentByPost(post.id, 0).then((res) => {
       setTotalPages(res.totalPages);
       setPage(0);
     });
-  }, [postId]);
+  }, [post.id]);
 
   const handleViewReplies = (commentId) => {
     const isOpen = openReplies[commentId];
@@ -47,7 +48,7 @@ const CommentList = ({ postId, comments, onEditComment }) => {
 
   const handleLoadMore = async () => {
     const nextPage = page + 1;
-    const res = await fetchCommentByPost(postId, nextPage, 8);
+    const res = await fetchCommentByPost(post.id, nextPage, 8);
 
     if (res) {
       setPage(nextPage);
@@ -79,7 +80,7 @@ const CommentList = ({ postId, comments, onEditComment }) => {
               <Avatar className="w-8 h-8 flex-shrink-0">
                 <AvatarImage src={cmt.authorAvatar} alt={cmt.authorName} />
                 <AvatarFallback className="bg-gray-200 text-gray-600 text-xs font-medium">
-                  {cmt.authorName[0]?.toUpperCase()}
+                  {cmt.authorName}
                 </AvatarFallback>
               </Avatar>
 
@@ -120,10 +121,12 @@ const CommentList = ({ postId, comments, onEditComment }) => {
                       onClose={() => setOpenMenuId(null)}
                       onEdit={() => onEditComment(cmt)}
                       canEdit={cmt.userId === authUser.id}
+                      onDelete={() => deleteComment(post.id, cmt.id)}
+                      canDelete={cmt.userId === authUser.id || post.author.id === authUser.id}
                     />
                   )}
                 </div>
-
+                
                 {totalReplies > 0 && (
                   <button
                     className="flex items-center space-x-2 mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors"

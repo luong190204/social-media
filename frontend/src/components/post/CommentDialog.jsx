@@ -146,7 +146,7 @@ const CommentDialog = ({ post, open, onClose }) => {
           {/* comment list */}
           <CommentList
             comments={commentsByPost[post.id] || []}
-            postId={post.id}
+            post={post}
             onEditComment={(c) => setEditingComment(c)}
           />
 
