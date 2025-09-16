@@ -41,14 +41,32 @@ export const useCommentStore = create((set) => ({
     try {
       const res = await postService.commentPost(postId, data);
       const newComment = res.data.result;
+      console.log("comment response:", res.data);
 
-      set((state) => ({
-        commentsByPost: {
-          ...state.commentsByPost,
-          [postId]: [newComment, ...(state.commentsByPost[postId] || [])],
-        },
-        isCommentLoading: false,
-      }));
+      set((state) => {
+        if (data.parentId) {
+          // nếu có parentId thì thêm vào replies
+          const prevReplies = state.repliesByComment[data.parentId] || [];
+          return {
+            repliesByComment: {
+              ...state.repliesByComment,
+              [data.parentId]: [...prevReplies || [], newComment],
+            },
+            isCommentLoading: false,
+          };
+        } else {
+          // thêm vào list comment cha
+          const prevComments = state.commentsByPost[postId] || [];
+          return {
+            commentsByPost: {
+              ...state.commentsByPost,
+              [postId]: [newComment, ...prevComments],
+            },
+            isCommentLoading: false,
+          }
+        }
+      })
+
       toast.success("Bình luận thành công!");
 
       return newComment;

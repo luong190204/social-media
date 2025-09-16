@@ -7,7 +7,6 @@ import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useCommentStore } from '@/store/useCommentStore ';
 import CommentList from './CommentList';
-import { toast } from 'sonner';
 import CommentInput from './CommentInput';
 
 const CommentDialog = ({ post, open, onClose }) => {
@@ -18,6 +17,7 @@ const CommentDialog = ({ post, open, onClose }) => {
     const [mediaUrls, setMediaUrls] = useState(post?.mediaUrls || "");
     const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
     const [editingComment, setEditingComment] = useState(null);
+    const [replyTo, setReplyTo] = useState(null); 
 
     const nextMedia = () => {
         if (currentMediaIndex < mediaUrls.length - 1) {
@@ -148,12 +148,15 @@ const CommentDialog = ({ post, open, onClose }) => {
             comments={commentsByPost[post.id] || []}
             post={post}
             onEditComment={(c) => setEditingComment(c)}
+            setReplyTo={setReplyTo}
           />
 
-          <CommentInput 
+          <CommentInput
             postId={post.id}
             editingComment={editingComment}
             onSubmitSuccess={() => setEditingComment(null)}
+            replyTo={replyTo}
+            onClearReply={() => setReplyTo(null)}
           />
         </div>
       </DialogContent>

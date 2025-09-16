@@ -8,7 +8,7 @@ import { Loader, MoreHorizontal, Plus } from 'lucide-react';
 import CommentMoreMenu from './CommentMoreMenu';
 import { useAuthStore } from '@/store/useAuthStore';
 
-const CommentList = ({ post, comments, onEditComment }) => {
+const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
   const {
     repliesByComment,
     fetchCommentByPost,
@@ -101,7 +101,12 @@ const CommentList = ({ post, comments, onEditComment }) => {
                       locale: vi,
                     })}
                   </span>
-                  <button className="text-xs text-gray-500 font-medium hover:text-gray-700 transition-colors">
+                  <button
+                    className="text-xs text-gray-500 font-medium hover:text-gray-700 transition-colors"
+                    onClick={() =>
+                      setReplyTo({ id: cmt.id, username: cmt.authorName })
+                    }
+                  >
                     Phản hồi
                   </button>
 
@@ -122,11 +127,14 @@ const CommentList = ({ post, comments, onEditComment }) => {
                       onEdit={() => onEditComment(cmt)}
                       canEdit={cmt.userId === authUser.id}
                       onDelete={() => deleteComment(post.id, cmt.id)}
-                      canDelete={cmt.userId === authUser.id || post.author.id === authUser.id}
+                      canDelete={
+                        cmt.userId === authUser.id ||
+                        post.author.id === authUser.id
+                      }
                     />
                   )}
                 </div>
-                
+
                 {totalReplies > 0 && (
                   <button
                     className="flex items-center space-x-2 mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors"
