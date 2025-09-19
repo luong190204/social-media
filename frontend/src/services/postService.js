@@ -42,8 +42,10 @@ export const postService = {
         });
     },
 
-    fetchRepliesByComment: async(commentId) => {
-        return await axiosInstance.get(`/posts/comments/${commentId}/replies`);
+    fetchRepliesByComment: async(commentId, page = 0, size = 8) => {
+        return await axiosInstance.get(`/posts/comments/${commentId}/replies`, {
+            params: {page, size},
+        });
     },
 
     updateComment: async (commentId, data) => {

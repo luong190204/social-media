@@ -76,19 +76,22 @@ export const useCommentStore = create((set) => ({
     }
   },
 
-  fetchRepliesByComment: async (commentId) => {
+  fetchRepliesByComment: async (commentId, page = 0, size = 2) => {
     set({ isRepliesLoading: true });
 
     try {
-      const res = await postService.fetchRepliesByComment(commentId);
+      const res = await postService.fetchRepliesByComment(commentId, page, size);
+      const newReplies = res.data.result.content;
+
       set((state) => {
-        const newState = {
+        const prevReplies = state.repliesByComment[commentId] || [];
+
+        return {
           ...state.repliesByComment,
-          [commentId]: {
-            items: res.data.result.content,
-          },
-        };
-        return { repliesByComment: newState };
+          [commentId]: page === 0 ? newReplies : [...prevReplies, ...newReplies],
+        },
+
+        set({ isRepliesLoading: false });
       });
     } catch (error) {
       console.error("Lỗi khi fetch replies:", error);

@@ -24,14 +24,25 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
 
+  const [pageByReplies, setPageByReplies] = useState({});
+  const [totalPagesByReplies, setTotalPagesByReplies] = useState({});
+
   const [openMenuId, setOpenMenuId] = useState(null); // id cmt đang mở menu
 
+  // Load cmt 
   useEffect(() => {
     fetchCommentByPost(post.id, 0).then((res) => {
       setTotalPages(res.totalPages);
       setPage(0);
     });
   }, [post.id]);
+
+  // Load replies theo page
+  useEffect(() => {
+    if (showReplies) {
+      
+    }
+  })
 
   const handleViewReplies = (commentId) => {
     const isOpen = openReplies[commentId];
@@ -67,8 +78,8 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
   return (
     <ScrollArea className="flex-1 p-4 space-y-4 overflow-y-auto">
       {comments?.map((cmt) => {
-        const repliesData = repliesByComment?.[cmt.id];
-        const replies = repliesData?.items || [];
+        
+        const replies = repliesByComment?.[cmt.id] || [];
 
         const totalReplies = cmt.countReplies || 0;
 
