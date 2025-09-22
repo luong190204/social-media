@@ -1,66 +1,41 @@
-import React, { useEffect, useState } from 'react'
-import { ScrollArea } from '../ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import React, { useEffect, useState } from "react";
+import { ScrollArea } from "../ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { useCommentStore } from '@/store/useCommentStore ';
-import { Loader, MoreHorizontal, Plus } from 'lucide-react';
-import CommentMoreMenu from './CommentMoreMenu';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useCommentStore } from "@/store/useCommentStore ";
+import { Loader, MoreHorizontal, Plus } from "lucide-react";
+import CommentMoreMenu from "./CommentMoreMenu";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
   const {
     repliesByComment,
     fetchCommentByPost,
     fetchRepliesByComment,
-    isRepliesLoading,
     isCommentLoading,
     deleteComment,
   } = useCommentStore();
 
   const { authUser } = useAuthStore();
 
-  const [openReplies, setOpenReplies] = useState({});
-  const [totalPages, setTotalPages] = useState(0);
-  const [page, setPage] = useState(0);
-
-  const [pageByReplies, setPageByReplies] = useState({});
-  const [totalPagesByReplies, setTotalPagesByReplies] = useState({});
-
   const [openMenuId, setOpenMenuId] = useState(null); // id cmt đang mở menu
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  // Load cmt 
+  // load comments khi mở post
   useEffect(() => {
     fetchCommentByPost(post.id, 0).then((res) => {
-      setTotalPages(res.totalPages);
-      setPage(0);
+      if (res) {
+        setPage(0);
+        setTotalPages(res.totalPages);
+      }
     });
-  }, [post.id]);
+  }, [post.id, fetchCommentByPost]);
 
-  // Load replies theo page
-  useEffect(() => {
-    if (showReplies) {
-      
-    }
-  })
-
-  const handleViewReplies = (commentId) => {
-    const isOpen = openReplies[commentId];
-
-    if (!isOpen) {
-      fetchRepliesByComment(commentId);
-    }
-
-    setOpenReplies((prev) => ({
-      ...prev,
-      [commentId]: !isOpen,
-    }));
-  };
-
-  const handleLoadMore = async () => {
+  const handleLoadMoreComments = async () => {
     const nextPage = page + 1;
     const res = await fetchCommentByPost(post.id, nextPage, 8);
-
     if (res) {
       setPage(nextPage);
       setTotalPages(res.totalPages);
@@ -78,12 +53,13 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
   return (
     <ScrollArea className="flex-1 p-4 space-y-4 overflow-y-auto">
       {comments?.map((cmt) => {
-        
-        const replies = repliesByComment?.[cmt.id] || [];
+        const repliesData = repliesByComment?.[cmt.id];
 
+        const replies = repliesData?.content || [];
+
+        const replyPage = repliesData?.page ?? -1;
+        const replyTotalPages = repliesData?.totalPages ?? 0;
         const totalReplies = cmt.countReplies || 0;
-
-        const showReplies = openReplies[cmt.id] || false;
 
         return (
           <div key={cmt.id} className="space-y-2">
@@ -146,31 +122,22 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
                   )}
                 </div>
 
-                {totalReplies > 0 && (
+                {!repliesData && totalReplies > 0 && (
                   <button
                     className="flex items-center space-x-2 mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                    onClick={() => handleViewReplies(cmt.id)}
+                    onClick={() => fetchRepliesByComment(cmt.id, 0, 2)} // load page=0
                   >
                     <div className="w-6 h-px bg-gray-300"></div>
                     <span className="font-medium">
-                      {showReplies
-                        ? "Ẩn câu trả lời"
-                        : `Xem ${totalReplies} câu trả lời`}
+                      Xem {totalReplies} câu trả lời
                     </span>
-                    {isRepliesLoading ? (
-                      <>
-                        <Loader className="size-5 animate-spin" />
-                      </>
-                    ) : (
-                      ""
-                    )}
                   </button>
                 )}
               </div>
             </div>
 
-            {showReplies && replies.length > 0 && (
-              <div className="ml-11 space-y-2 pb-4">
+            {replies.length > 0 && (
+              <div className="ml-11 space-y-2 pb-2">
                 {replies.map((reply) => (
                   <div key={reply.id} className="flex items-start space-x-3">
                     <Avatar className="w-6 h-6 flex-shrink-0">
@@ -208,6 +175,21 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
                 ))}
               </div>
             )}
+
+            {/* Nút load thêm replies */}
+            {replyPage + 1 < replyTotalPages && (
+              <div className="flex justify-start ">
+                <button
+                  onClick={() => fetchRepliesByComment(cmt.id, page + 1, 2)}
+                  className="flex items-center mb-2 ml-12 space-x-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <div className="w-6 h-px bg-gray-300"></div>
+                  <span className="font-medium">
+                    Xem thêm {totalReplies - replies.length} câu trả lời
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         );
       })}
@@ -215,7 +197,7 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
       {page + 1 < totalPages && (
         <div className="flex justify-center my-8">
           <button
-            onClick={handleLoadMore}
+            onClick={handleLoadMoreComments}
             className="text-gray-800  mt-2 border-2 border-gray-600 rounded-full p-1"
           >
             <Plus className="w-4 h-4" />
@@ -226,4 +208,4 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
   );
 };
 
-export default CommentList
+export default CommentList;

@@ -145,7 +145,7 @@ const CommentDialog = ({ post, open, onClose }) => {
 
           {/* comment list */}
           <CommentList
-            comments={commentsByPost[post.id] || []}
+            comments={commentsByPost?.[post.id] || []}
             post={post}
             onEditComment={(c) => setEditingComment(c)}
             setReplyTo={setReplyTo}

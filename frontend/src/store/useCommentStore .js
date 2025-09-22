@@ -27,7 +27,7 @@ export const useCommentStore = create((set) => ({
           isCommentLoading: false,
         };
       });
-      
+
       return res.data.result;
     } catch (error) {
       toast.error("Lỗi khi tải");
@@ -41,21 +41,28 @@ export const useCommentStore = create((set) => ({
     try {
       const res = await postService.commentPost(postId, data);
       const newComment = res.data.result;
-      console.log("comment response:", res.data);
 
       set((state) => {
         if (data.parentId) {
-          // nếu có parentId thì thêm vào replies
-          const prevReplies = state.repliesByComment[data.parentId] || [];
+          // Nếu là reply
+          const prevData = state.repliesByComment[data.parentId] || {
+            content: [],
+            page: 0,
+            totalPages: 1,
+          };
+
           return {
             repliesByComment: {
               ...state.repliesByComment,
-              [data.parentId]: [...prevReplies || [], newComment],
+              [data.parentId]: {
+                ...prevData,
+                content: [...prevData.content, newComment], // thêm vào mảng content
+              },
             },
             isCommentLoading: false,
           };
         } else {
-          // thêm vào list comment cha
+          // Nếu là comment cha
           const prevComments = state.commentsByPost[postId] || [];
           return {
             commentsByPost: {
@@ -63,40 +70,52 @@ export const useCommentStore = create((set) => ({
               [postId]: [newComment, ...prevComments],
             },
             isCommentLoading: false,
-          }
+          };
         }
-      })
+      });
 
       toast.success("Bình luận thành công!");
-
       return newComment;
     } catch (error) {
+      console.error("Lỗi khi bình luận:", error);
       toast.error("Lỗi khi bình luận");
       set({ isCommentLoading: false });
     }
   },
 
   fetchRepliesByComment: async (commentId, page = 0, size = 2) => {
+    // bật loading
     set({ isRepliesLoading: true });
 
     try {
-      const res = await postService.fetchRepliesByComment(commentId, page, size);
-      const newReplies = res.data.result.content;
+      const res = await postService.fetchRepliesByComment(
+        commentId,
+        page,
+        size
+      );
+      const newReplies = res?.data?.result?.content || [];
+      const totalPages = res?.data?.result?.totalPages ?? 0;
 
+      // dùng functional update, lấy prev content đúng là mảng
       set((state) => {
-        const prevReplies = state.repliesByComment[commentId] || [];
+        const prevContent = state.repliesByComment?.[commentId]?.content || [];
 
         return {
-          ...state.repliesByComment,
-          [commentId]: page === 0 ? newReplies : [...prevReplies, ...newReplies],
-        },
-
-        set({ isRepliesLoading: false });
+          repliesByComment: {
+            ...state.repliesByComment,
+            [commentId]: {
+              content:
+                page === 0 ? newReplies : [...prevContent, ...newReplies],
+              page,
+              totalPages,
+            },
+          },
+        };
       });
     } catch (error) {
       console.error("Lỗi khi fetch replies:", error);
-      set({ isRepliesLoading: false });
     } finally {
+      // tắt loading ở finally để đảm bảo luôn reset
       set({ isRepliesLoading: false });
     }
   },
@@ -111,13 +130,13 @@ export const useCommentStore = create((set) => ({
         // Vòng lặp map tìm kiếm bình luận có ID khớp và thay thế nó bằng dữ liệu mới nhất từ server.
         // lấy ra newMap bằng object key -> duyệt qua postId trong newMap -> nếu id cmt trùng viiuws commentId -> update
         Object.keys(newMap).forEach((postId) => {
-          newMap[postId] = newMap[postId].map((c) => 
+          newMap[postId] = newMap[postId].map((c) =>
             c.id === commentId ? updated : c
           );
         });
 
         return { commentsByPost: newMap };
-      })
+      });
       toast.success("Cập nhật bình luận thành công");
       return res.data.result;
     } catch (error) {
@@ -127,19 +146,20 @@ export const useCommentStore = create((set) => ({
 
   deleteComment: async (postId, commentId) => {
     try {
-      await postService.deleteComment(commentId);      
+      await postService.deleteComment(commentId);
 
       set((state) => ({
         commentsByPost: {
           ...state.commentsByPost,
-          [postId]: state.commentsByPost[postId].filter((c) => c.id !== commentId),
-        }
+          [postId]: state.commentsByPost[postId].filter(
+            (c) => c.id !== commentId
+          ),
+        },
       }));
 
-      toast.success("Xóa bình luận thành công")
+      toast.success("Xóa bình luận thành công");
     } catch (error) {
-      toast.error("Xóa bình luận thất bại")  
+      toast.error("Xóa bình luận thất bại");
     }
   },
-
 }));
