@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
+import EditProfile from "./pages/editProfile";
 
 import { useAuthStore } from './store/useAuthStore'
 import { useEffect } from "react";
@@ -46,6 +47,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
       </Route>
       {/* Người dùng đã đăng nhập sẽ không cần truy cập trang Auth */}
       <Route path="/login" element={<Navigate to="/" />} />

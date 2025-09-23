@@ -32,6 +32,20 @@ export const useUserStore = create ((set) => ({
         } finally {
             set({ isUpdatingProfile: false })
         }
+    },
+
+    updateProfile: async (data) => {
+        set({ isUpdatingProfile: true })
+
+        try {
+            const res = await userService.updateProfile(data);
+            set({ userProfile: res.data.result });
+            toast.success("Cập nhật thông tin thành công!");
+        } catch (error) {
+            toast.error("Cập nhật thồn tin thất bại!");
+        } finally {
+            set({ isUpdatingProfile: false });
+        }
     }
 
 }))

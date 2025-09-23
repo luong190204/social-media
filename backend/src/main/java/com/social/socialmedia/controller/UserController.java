@@ -58,7 +58,7 @@ import java.util.List;
 
         }
 
-        @PutMapping
+        @PutMapping("/update-profile")
         ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest request) {
             return ApiResponse.<UserResponse>builder()
                     .result(userService.updateUser(request))

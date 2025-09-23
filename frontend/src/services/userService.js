@@ -11,5 +11,9 @@ export const userService = {
                 "Content-Type": "multipart/form-data"
             },
         });
+    },
+
+    updateProfile: async (data) => {
+        return await axiosInstance.put("/users/update-profile", data);
     }
 } 

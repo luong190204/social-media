@@ -13,10 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class UserUpdateRequest {
-
     private String bio;
     private String location;
     private String gender;
     private LocalDate dob;
-
 }

@@ -63,7 +63,7 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
 
         return (
           <div key={cmt.id} className="space-y-2">
-            <div className="flex items-start space-x-3 mb-4">
+            <div className="flex items-start space-x-3 mt-4">
               <Avatar className="w-8 h-8 flex-shrink-0">
                 <AvatarImage src={cmt.authorAvatar} alt={cmt.authorName} />
                 <AvatarFallback className="bg-gray-200 text-gray-600 text-xs font-medium">
@@ -121,21 +121,42 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
                     />
                   )}
                 </div>
-
-                {!repliesData && totalReplies > 0 && (
-                  <button
-                    className="flex items-center space-x-2 mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                    onClick={() => fetchRepliesByComment(cmt.id, 0, 2)} // load page=0
-                  >
-                    <div className="w-6 h-px bg-gray-300"></div>
-                    <span className="font-medium">
-                      Xem {totalReplies} câu trả lời
-                    </span>
-                  </button>
-                )}
               </div>
             </div>
 
+            {/* nút lần đầu (chưa fetch) */}
+            {!repliesData && totalReplies > 0 ? (
+              <button
+                className="flex items-center space-x-2 mt-3 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={() => fetchRepliesByComment(cmt.id, 0, 2)} // load page=0
+              >
+                <div className="w-6 h-px bg-gray-300"></div>
+                <span className="font-medium">
+                  Xem {totalReplies} câu trả lời
+                </span>
+              </button>
+            ) : (
+              // Nút load thêm replies
+              replies.length > 0 &&
+              replies.length < totalReplies && (
+                <div className="flex justify-start ">
+                  <button
+                    onClick={() => {
+                      const nextPage = replyPage >= 0 ? replyPage + 1 : 0;
+                      fetchRepliesByComment(cmt.id, nextPage, 2);
+                    }}
+                    className="flex items-center mb-2 ml-12 space-x-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    <div className="w-6 h-px bg-gray-300"></div>
+                    <span className="font-medium">
+                      Xem thêm {totalReplies - replies.length} câu trả lời
+                    </span>
+                  </button>
+                </div>
+              )
+            )}
+
+            {/* Render replies */}
             {replies.length > 0 && (
               <div className="ml-11 space-y-2 pb-2">
                 {replies.map((reply) => (
@@ -173,21 +194,6 @@ const CommentList = ({ post, comments, onEditComment, setReplyTo }) => {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {/* Nút load thêm replies */}
-            {replyPage + 1 < replyTotalPages && (
-              <div className="flex justify-start ">
-                <button
-                  onClick={() => fetchRepliesByComment(cmt.id, page + 1, 2)}
-                  className="flex items-center mb-2 ml-12 space-x-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  <div className="w-6 h-px bg-gray-300"></div>
-                  <span className="font-medium">
-                    Xem thêm {totalReplies - replies.length} câu trả lời
-                  </span>
-                </button>
               </div>
             )}
           </div>

@@ -2,7 +2,7 @@ import { postService } from "@/services/postService";
 import { toast } from "sonner";
 import { create } from "zustand";
 
-export const useCommentStore = create((set) => ({
+export const useCommentStore = create((set, get) => ({
   commentsByPost: {}, // {"postId: [comments...], ...."}
   repliesByComment: {},
   isCommentLoading: false,
@@ -42,28 +42,39 @@ export const useCommentStore = create((set) => ({
       const res = await postService.commentPost(postId, data);
       const newComment = res.data.result;
 
+      // kiểm tra trước có replies data chưa (dùng get())
+      const hadRepliesBefore = get().repliesByComment?.[data.parentId];
+
       set((state) => {
+        // Nếu là reply
         if (data.parentId) {
-          // Nếu là reply
-          const prevData = state.repliesByComment[data.parentId] || {
-            content: [],
-            page: 0,
-            totalPages: 1,
+          const prevData = state.repliesByComment[data.parentId];
+
+          const prevContent = prevData?.content || [];
+
+          const newRepliesByComment = {
+            ...state.repliesByComment,
+            [data.parentId]: {
+              content: [...prevContent, newComment], // Thêm vào mảng content
+              page: prevData?.page ?? 0,
+              totalPages: prevData?.totalPages ?? 0,
+            },
           };
 
+          // tăng countReplies cho comment cha trong commentsByPost
+          const prevComments = state.commentsByPost?.[postId] || [];
+          const updateComments = prevComments.map((c) => 
+            c.id === data.parentId ? {...c, countReplies: (c.countReplies || 0) + 1} : c
+          );
+
           return {
-            repliesByComment: {
-              ...state.repliesByComment,
-              [data.parentId]: {
-                ...prevData,
-                content: [...prevData.content, newComment], // thêm vào mảng content
-              },
-            },
+            repliesByComment: newRepliesByComment,
+            commentsByPost: {...state.commentsPost, [postId]: updateComments},
             isCommentLoading: false,
           };
         } else {
           // Nếu là comment cha
-          const prevComments = state.commentsByPost[postId] || [];
+          const prevComments = state.commentsByPost?.[postId] || [];
           return {
             commentsByPost: {
               ...state.commentsByPost,
@@ -74,6 +85,11 @@ export const useCommentStore = create((set) => ({
         }
       });
 
+      // Nếu trước đó chưa fetch replies, gọi fetch page 0 để sync với server (merge + dedupe sẽ xử lý).
+      if (data.parentId && !hadRepliesBefore) {
+        // gọi không chờ (fire-and-forget)
+        get().fetchRepliesByComment(data.parentId, 0, 2);
+      }
       toast.success("Bình luận thành công!");
       return newComment;
     } catch (error) {
@@ -100,12 +116,32 @@ export const useCommentStore = create((set) => ({
       set((state) => {
         const prevContent = state.repliesByComment?.[commentId]?.content || [];
 
+        // nếu page === 0 thì ưu tiên server trả về (đảm bảo order), rồi thêm các optimistic replies không có trong server
+        const merged =
+          page === 0
+            ? [
+                ...newReplies,
+                ...prevContent.filter(
+                  (r) => !newReplies.some((n) => n.id === r.id)
+                ),
+              ]
+            : [...prevContent, ...newReplies];    
+        
+        const seen = new Set();
+        const unique = [];
+
+        for (const r of merged) {
+          if (!seen.has(r.id)) {
+            seen.add(r.id);
+            unique.push(r);
+          }
+        }
+
         return {
           repliesByComment: {
             ...state.repliesByComment,
             [commentId]: {
-              content:
-                page === 0 ? newReplies : [...prevContent, ...newReplies],
+              content:unique,
               page,
               totalPages,
             },
