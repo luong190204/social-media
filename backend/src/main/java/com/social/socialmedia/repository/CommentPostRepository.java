@@ -14,4 +14,6 @@ public interface CommentPostRepository extends MongoRepository<Comment, String> 
     void deleteByParentId(String parentId);
 
     Long countByParentId(String parentId);
+
+    Long countByPostId(String postId);
 }

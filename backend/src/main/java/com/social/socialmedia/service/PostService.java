@@ -283,6 +283,14 @@ public class PostService {
         // xóa comment cha
         commentPostRepository.deleteById(commentId);
     }
+
+    public Long getCommentCountByPost(String postId) {
+
+        if (!postRepository.existsById(postId)) throw new AppException(ErrorCode.POST_NOT_FOUND);
+
+        Long countComment = commentPostRepository.countByPostId(postId);
+        return countComment;
+    }
 }
 
 

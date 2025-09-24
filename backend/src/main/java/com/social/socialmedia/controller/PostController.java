@@ -116,4 +116,13 @@ public class PostController {
                 .build();
     }
 
+    @GetMapping("/comment/{postId}/count")
+    public ApiResponse<Long> getCommentCountByPost(@PathVariable String postId) {
+        Long countComment = postService.getCommentCountByPost(postId);
+
+        return ApiResponse.<Long>builder()
+                .result(countComment)
+                .build();
+    }
+
 }

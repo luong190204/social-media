@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Heart, MessageCircle, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -7,6 +7,7 @@ import PostMoreMenu from "./PostMoreMenu";
 import LikeButton from "./LikeButton";
 import { usePostStore } from "@/store/usePostStore";
 import CommentDialog from "./CommentDialog";
+import { useCommentStore } from "@/store/useCommentStore ";
 
 const PortCard = ({ post }) => {
 
@@ -16,6 +17,12 @@ const PortCard = ({ post }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [openComment, setOpenComment] = useState(false);
+  
+  // Lấy ra số lượng bình luận từ store
+  const { commentCountByPost, fetchCommentCountByPost } = useCommentStore();
+  useEffect(() => {
+    fetchCommentCountByPost(post.id);
+  }, [post.id, fetchCommentCountByPost]);
 
   const goToPrevious = () => {
     const newIndex =
@@ -32,6 +39,8 @@ const PortCard = ({ post }) => {
         : currentImageIndex + 1;
     setCurrentImageIndex(newIndex);
   };
+
+
 
   return (
     <div className="bg-white shadow rounded-3xl p-4 mb-4">
@@ -175,9 +184,17 @@ const PortCard = ({ post }) => {
               stroke-width="2"
             ></path>
           </svg>
+
+          <span className="text-sm text-gray-600">
+            {commentCountByPost[post.id] ?? 0}
+          </span>
         </Button>
 
-        <CommentDialog post={post} open={openComment} onClose={() => setOpenComment(false)}/>
+        <CommentDialog
+          post={post}
+          open={openComment}
+          onClose={() => setOpenComment(false)}
+        />
       </div>
     </div>
   );

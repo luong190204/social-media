@@ -104,10 +104,10 @@ const ProfilePage = () => {
               </p>
             </button>
           </div>
-
+          <p className="font-normal">{userProfile?.fullName}</p>
           <div className="flex gap-6 mt-4">
             <span>
-              <b>{userProfile?.postsCount || 0}</b> bài viết
+              <b>{posts.length || 0}</b> bài viết
             </span>
             <span>
               <b>{userProfile?.followersCount || 0}</b> người theo dõi
@@ -118,11 +118,10 @@ const ProfilePage = () => {
           </div>
 
           <div className="mt-4 mb-12 space-y-2">
-            <p className="font-medium">{userProfile?.fullName}</p>
-            <p className="text-gray-600">{userProfile?.bio}</p>
-            <p className="text-gray-600 flex items-center gap-2">
+            <p className="text-base font-normal">{userProfile?.bio}</p>
+            <p className="text-base font-normal flex items-center gap-2">
               <svg
-                className="h-5 w-5 text-gray-400"
+                className="h-5 w-5 text-gray-800"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

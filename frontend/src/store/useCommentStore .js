@@ -4,6 +4,7 @@ import { create } from "zustand";
 
 export const useCommentStore = create((set, get) => ({
   commentsByPost: {}, // {"postId: [comments...], ...."}
+  commentCountByPost: {},
   repliesByComment: {},
   isCommentLoading: false,
   isRepliesLoading: false,
@@ -63,13 +64,15 @@ export const useCommentStore = create((set, get) => ({
 
           // tăng countReplies cho comment cha trong commentsByPost
           const prevComments = state.commentsByPost?.[postId] || [];
-          const updateComments = prevComments.map((c) => 
-            c.id === data.parentId ? {...c, countReplies: (c.countReplies || 0) + 1} : c
+          const updateComments = prevComments.map((c) =>
+            c.id === data.parentId
+              ? { ...c, countReplies: (c.countReplies || 0) + 1 }
+              : c
           );
 
           return {
             repliesByComment: newRepliesByComment,
-            commentsByPost: {...state.commentsPost, [postId]: updateComments},
+            commentsByPost: { ...state.commentsPost, [postId]: updateComments },
             isCommentLoading: false,
           };
         } else {
@@ -125,8 +128,8 @@ export const useCommentStore = create((set, get) => ({
                   (r) => !newReplies.some((n) => n.id === r.id)
                 ),
               ]
-            : [...prevContent, ...newReplies];    
-        
+            : [...prevContent, ...newReplies];
+
         const seen = new Set();
         const unique = [];
 
@@ -141,7 +144,7 @@ export const useCommentStore = create((set, get) => ({
           repliesByComment: {
             ...state.repliesByComment,
             [commentId]: {
-              content:unique,
+              content: unique,
               page,
               totalPages,
             },
@@ -196,6 +199,21 @@ export const useCommentStore = create((set, get) => ({
       toast.success("Xóa bình luận thành công");
     } catch (error) {
       toast.error("Xóa bình luận thất bại");
+    }
+  },
+
+  fetchCommentCountByPost: async (postId) => {
+    try {
+      const res = await postService.countCommentByPost(postId);
+
+      set((state) => ({
+        commentCountByPost: {
+          ...state.commentCountByPost,
+          [postId]: res.data.result,
+        },
+      }));
+    } catch (error) {
+      console.error("Lỗi khi đếm bình luận:", error);
     }
   },
 }));

@@ -54,5 +54,9 @@ export const postService = {
 
     deleteComment: async(commentId) => {
         return await axiosInstance.delete(`/posts/comments/${commentId}`);
+    },
+
+    countCommentByPost: async (postId) => {
+        return await axiosInstance.get(`/posts/comment/${postId}/count`);
     }
 }
