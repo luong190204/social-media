@@ -5,11 +5,13 @@ import SignUpPage from "./pages/SignUpPage";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
 import EditProfile from "./pages/editProfile";
+import ProfilePage from "./pages/ProfilePage";
+import MessagePage from "./pages/messagesPage";
 
 import { useAuthStore } from './store/useAuthStore'
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
-import ProfilePage from "./pages/ProfilePage";
+
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -48,6 +50,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/messages" element={<MessagePage />}/>
       </Route>
       {/* Người dùng đã đăng nhập sẽ không cần truy cập trang Auth */}
       <Route path="/login" element={<Navigate to="/" />} />
