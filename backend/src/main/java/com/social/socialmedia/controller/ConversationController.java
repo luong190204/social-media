@@ -1,6 +1,7 @@
 package com.social.socialmedia.controller;
 
 import com.social.socialmedia.dto.request.ApiResponse;
+import com.social.socialmedia.dto.response.ConversationResponse;
 import com.social.socialmedia.entity.Conversation;
 import com.social.socialmedia.service.ConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,18 @@ public class ConversationController {
                 .build();
     }
 
-    @GetMapping
+    // Lấy ra để hiện thị lên sidebar
+    @GetMapping("/raw")
     public ApiResponse<List<Conversation>> getConversation() {
         return ApiResponse.<List<Conversation>>builder()
                 .result(conversationService.getUsersConversations())
+                .build();
+    }
+
+    @GetMapping
+    public ApiResponse<List<ConversationResponse>> getConversationsForSidebar() {
+        return ApiResponse.<List<ConversationResponse>>builder()
+                .result(conversationService.getConversationsListForSidebar())
                 .build();
     }
 

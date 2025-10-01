@@ -1,19 +1,27 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChatSidebar } from './ChatSidebar';
 import ChatHeader from './ChatHeader';
 import ChatContainer from './ChatContainer';
 import ChatInput from './ChatInput';
 import NoChatSelected from './NoChatSelected';
-import { users, mockMessages } from "./MockData";
+import { useChatStore } from '@/store/useChatStore';
 
 const MessagesInterface = () => {
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [currentMessages, setCurrentMessages] = useState([]);
 
-  const handleUserSelect = (user) => {
-    setSelectedUser(user);
-    // Load messages for selected user
-    setCurrentMessages(user.id === 1 ? mockMessages : []);
+  const {
+    conversations,
+    messages,
+    selectConversation,
+    fetchConversations,
+    fetchMessages,
+  } = useChatStore(); 
+    
+    useEffect(() => {
+      fetchConversations();
+    }, [fetchConversations]);
+
+  const handleUserSelect = (conv) => {
+    fetchMessages(conv);
   };
 
   const handleSendMessage = (content) => {
@@ -31,26 +39,28 @@ const MessagesInterface = () => {
     <div className="flex h-screen bg-white">
       {/* Component 1: ChatSidebar */}
       <ChatSidebar
-        users={users}
-        selectedUser={selectedUser}
+        users={conversations}
+        selectedUser={selectConversation}
         onUserSelect={handleUserSelect}
       />
 
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
-        {selectedUser ? (
+        {selectConversation ? (
           <>
-            {/* Component 2: ChatHeader */}
-            <ChatHeader user={selectedUser} />
+            <ChatHeader
+              user={{
+                name: selectConversation.partnerName,
+                avatar:
+                  selectConversation.partnerAvatar || "/assets/avatar.jpg",
+              }}
+            />
 
-            {/* Component 3: ChatContainer */}
-            <ChatContainer messages={currentMessages} />
+            <ChatContainer messages={messages} />
 
-            {/* Component 4: ChatInput */}
             <ChatInput onSendMessage={handleSendMessage} />
           </>
         ) : (
-          /* Component 5: NoChatSelected */
           <NoChatSelected />
         )}
       </div>

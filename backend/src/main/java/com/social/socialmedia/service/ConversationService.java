@@ -1,10 +1,15 @@
 package com.social.socialmedia.service;
 
 import com.social.socialmedia.configuration.SecurityUtils;
+import com.social.socialmedia.dto.response.ConversationResponse;
 import com.social.socialmedia.entity.Conversation;
+import com.social.socialmedia.entity.Message;
+import com.social.socialmedia.entity.User;
 import com.social.socialmedia.exception.AppException;
 import com.social.socialmedia.exception.ErrorCode;
 import com.social.socialmedia.repository.ConversationRepository;
+import com.social.socialmedia.repository.MessageRepository;
+import com.social.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,12 @@ import java.util.stream.Collectors;
 public class ConversationService {
     @Autowired
     private ConversationRepository conversationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     public Conversation createConversation(List<String> participantIds) {
 
@@ -53,5 +64,34 @@ public class ConversationService {
         String currentUserId = SecurityUtils.getCurrentUserId();
 
         return conversationRepository.findByParticipantsContaining(currentUserId);
+    }
+
+    public List<ConversationResponse> getConversationsListForSidebar() {
+        String currentUserId = SecurityUtils.getCurrentUserId();
+        List<Conversation> conversations = conversationRepository.findByParticipantsContaining(currentUserId);
+
+        return conversations.stream().map(conv -> {
+            String partnerId = conv.getParticipants().stream()
+                    .filter(id -> !id.equals(currentUserId))
+                    .findFirst()
+                    .orElse(null);
+
+            User partner = userRepository.findById(partnerId).orElseThrow(() -> new AppException(ErrorCode.USER_FOUND));
+
+            Message lastMessage = null;
+            if (conv.getLastMessageId() != null) {
+                lastMessage = messageRepository.findById(conv.getLastMessageId()).orElse(null);
+            }
+
+            return ConversationResponse.builder()
+                    .id(conv.getId())
+                    .partnerId(partner.getId())
+                    .partnerName(partner.getFullName())
+                    .partnerAvatar(partner.getProfilePic())
+                    .lastMessageContent(lastMessage != null ? lastMessage.getContent() : null)
+                    .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
+                    .unreadCount(conv.getUnReadCount().getOrDefault(currentUserId, 0))
+                    .build();
+        }).toList();
     }
 }

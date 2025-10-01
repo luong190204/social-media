@@ -1,65 +1,10 @@
 import { MoreVertical, Search } from 'lucide-react';
-import React from 'react'
+import React, { useEffect } from 'react'
 
 export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
-   const Avatar = ({ src, name, size = 'md', hasStory = false, isOnline = false }) => {
-    const sizeClasses = {
-      sm: 'w-8 h-8',
-      md: 'w-12 h-12',
-      lg: 'w-16 h-16'
-    };
-
-    const initial = name?.charAt(0).toUpperCase() || '?';
-
-    return (
-      <div className="relative">
-        <div className={`${sizeClasses[size]} rounded-full ${hasStory ? 'ring-2 ring-pink-500 ring-offset-2' : ''} overflow-hidden bg-gray-200 flex items-center justify-center`}>
-          {src ? (
-            <img src={src} alt={name} className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-gray-600 font-medium">{initial}</span>
-          )}
-        </div>
-        {isOnline && (
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-        )}
-      </div>
-    );
-  };
-
-  // UserItem component inline
-  const UserItem = ({ user, isActive, onClick }) => {
-    return (
-      <div
-        onClick={() => onClick(user)}
-        className={`flex items-center p-3 cursor-pointer hover:bg-gray-100 ${isActive ? 'bg-blue-50' : ''}`}
-      >
-        <Avatar
-          src={user.avatar}
-          name={user.name}
-          hasStory={user.hasStory}
-          isOnline={user.isOnline}
-        />
-        <div className="ml-3 flex-1 min-w-0">
-          <div className="flex items-center">
-            <h3 className="font-medium text-gray-900 truncate">{user.name}</h3>
-            {user.isVerified && (
-              <div className="ml-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs">✓</span>
-              </div>
-            )}
-          </div>
-          <p className="text-sm text-gray-500 truncate">
-            {user.lastMessage || 'Hoạt động ' + user.time}
-          </p>
-        </div>
-        <span className="text-xs text-gray-400">{user.time}</span>
-      </div>
-    );
-  };
 
   return (
-    <div className="w-1/3 border-r flex flex-col">
+    <div className="hidden md:block w-[400px] border-r border-gray-200 overflow-y-auto">
       {/* Header */}
       <div className="p-4 border-b flex items-center">
         <h1 className="text-xl font-semibold">buidihluong</h1>
@@ -88,19 +33,64 @@ export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
         </div>
       </div>
 
-      {/* User List */}
-      <div className="flex-1 overflow-y-auto">
-        {users.map(user => (
-          <UserItem
-            key={user.id}
-            user={user}
-            isActive={selectedUser?.id === user.id}
-            onClick={onUserSelect}
-          />
-        ))}
-      </div>
+      {/* Conversations List */}
+      {users.length === 0 ? (
+        <p className="p-4 text-gray-500 text-sm text-center">
+          Chưa có cuộc trò chuyện nào
+        </p>
+      ) : (
+        users.map((conv) => (
+          <div
+            key={conv.id}
+            className={`flex items-center p-3 cursor-pointer ${
+              selectedUser?.id === conv.id ? "bg-gray-300" : ""
+            }`}
+            onClick={() => onUserSelect(conv)}
+          >
+            <button
+              onClick={() => {
+                console.log("LOG:", conv);
+                onUserSelect(conv);
+              }}
+            >
+              Click
+            </button>
+
+            <img
+              src={conv.partnerAvatar || "/assets/avatar.jpg"}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+
+            <div className="ml-3 flex-1 overflow-hidden">
+              <div className="flex justify-between items-center">
+                <p className="font-medium truncate">{conv.partnerName}</p>
+                {conv.lastMessageTime && (
+                  <span className="text-xs text-gray-400 ">
+                    {new Date(conv.lastMessageTime).toLocaleDateString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-sm text-gray-500 truncate">
+                {conv.lastMessageContent
+                  ? conv.lastMessageContent.startsWith("http")
+                    ? "Hình ảnh"
+                    : conv.lastMessageContent
+                  : "Chưa có tin nhắn"}
+              </p>
+            </div>
+
+            {conv.unreadCount > 0 && (
+              <span className="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                {conv.unreadCount}
+              </span>
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
-
-
 };

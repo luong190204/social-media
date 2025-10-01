@@ -32,7 +32,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINT = {"/api/auth/register", "/api/auth/login", "/api/auth/logout", "/api/auth/introspect"
-            , "/api/auth/refresh", "/api/posts/**"};
+            , "/api/auth/refresh", "/api/posts/**", "/api/conversations"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
