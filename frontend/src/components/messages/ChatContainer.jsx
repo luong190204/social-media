@@ -1,50 +1,89 @@
-import React from "react";
+import { useChatStore } from "@/store/useChatStore";
+import React, { useEffect, useRef } from "react";
+import ChatHeader from "./ChatHeader";
+import MessageSkeleton from "./MessageSkeleton";
+import ChatInput from "./ChatInput";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ChatContainer({ messages }) {
-  const MessageBubble = ({ message }) => {
-    const isOwn = message.sender === "own";
 
+  const messageEndRef = useRef();
+
+  const { isMessagesLoading } = useChatStore();
+
+  const { authUser } = useAuthStore();
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages])
+
+  if (isMessagesLoading) {
     return (
-      <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}>
-        <div
-          className={`max-w-xs lg:max-w-md ${isOwn ? "order-2" : "order-1"}`}
-        >
-          {message.type === "image" ? (
-            <div className="rounded-2xl overflow-hidden">
-              <img
-                src={message.content}
-                alt="Shared image"
-                className="w-full h-auto"
-              />
-            </div>
-          ) : (
-            <div
-              className={`px-4 py-2 rounded-2xl ${
-                isOwn ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-900"
-              }`}
-            >
-              {message.content}
-            </div>
-          )}
-          <div className="text-xs text-gray-500 mt-1 text-center">
-            {message.time}
-          </div>
-        </div>
+      <div className="flex-1 flex flex-col overflow-auto">
+        <ChatHeader />
+        <MessageSkeleton />
+        <ChatInput />
       </div>
-    );
-  };
-
+    )
+  }
   return (
-    <div className="flex-1 overflow-y-auto p-4">
-      {messages.length > 0 ? (
-        messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
-        ))
-      ) : (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Chưa có tin nhắn nào</p>
-        </div>
-      )}
+    <div className="flex-1 overflow-y-auto px-4 py-4 bg-white">
+
+      <button onClick={() => console.log("message: ", messages)
+      }>Test</button>
+
+      <div className="max-w-3xl mx-auto space-y-1">
+        {messages?.content?.map((message) => {
+
+          const isOwnMessage = message.senderId === authUser.id;
+          return (
+            <div
+              key={message.id}
+              className={`flex ${
+                isOwnMessage ? "justify-end" : "justify-start"
+              }`}
+              ref={messageEndRef}
+            >
+              <div
+                className={`flex flex-col max-w-[70%] ${
+                  isOwnMessage ? "items-end" : "items-start"
+                }`}
+              >
+                {/* Message Bubble */}
+                <div
+                  className={`relative px-3 py-2 rounded-3xl break-words ${
+                    isOwnMessage
+                      ? "bg-blue-500 text-white rounded-br-md"
+                      : "bg-gray-100 text-gray-900 rounded-bl-md"
+                  }`}
+                >
+                  {message.type === "IMAGE" ? (
+                    <img
+                      src={message.content}
+                      alt="Sent image"
+                      className="rounded-2xl max-w-full h-auto max-h-80 object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    />
+                  ) : (
+                    <p className="text-[15px] leading-5 whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                  )}
+                </div>
+
+                {/* Timestamp */}
+                {message.timestamp && (
+                  <span className="text-[11px] text-gray-400 mt-1 px-2">
+                    {new Date(message.timestamp).toLocaleTimeString("vi-VN", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -47,12 +47,7 @@ export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
             }`}
             onClick={() => onUserSelect(conv)}
           >
-            <button
-              onClick={() => {
-                console.log("LOG:", conv);
-                onUserSelect(conv);
-              }}
-            >
+            <button onClick={() => console.log("conv", conv)}>
               Click
             </button>
 

@@ -6,6 +6,7 @@ export const useChatStore = create((set) => ({
   conversations: [],
   messages: [],
   selectConversation: null,
+  isMessagesLoading: false,
 
   fetchConversations: async () => {
     try {
@@ -17,6 +18,7 @@ export const useChatStore = create((set) => ({
   },
 
   fetchMessages: async (conversation) => {
+    set({ isMessagesLoading: true });
     try {
       const res = await chatService.fetchMessages(conversation.id);
       set({
@@ -25,6 +27,40 @@ export const useChatStore = create((set) => ({
       });
     } catch (error) {
       toast.error("Lỗi khi tải tin nhắn");
+    } finally {
+      set({ isMessagesLoading: false });
     }
   },
+
+  sendTextMessage: async (conversationId, senderId, content) => {
+    try {
+      const res = await chatService.sendTextMessage({
+        conversationId,
+        senderId,
+        content,
+      });
+
+      set((state) => ({
+        messages: [...state.messages, res.data.result]
+      }));
+    } catch (error) {
+      toast.error("Lỗi khi gửi tin nhắn!");
+    }
+  },
+
+  sendImageMessage: async (conversationId, senderId, file) => {
+    try {
+      const res = await chatService.sendImageMessage({
+        conversationId,
+        senderId,
+        file,
+      })
+
+      set((state) => ({
+        messages: [...state.messages, res.data.result],
+      }))
+    } catch (error) {
+      toast.error("Lỗi khi gửi ảnh!")
+    }
+  }
 }));

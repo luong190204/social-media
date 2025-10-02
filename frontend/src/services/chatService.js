@@ -14,5 +14,22 @@ export const chatService = {
         return await axiosInstance.get(
           `/messages/conversations/${conversationId}/messages`
         );
+    },
+
+    sendTextMessage: async (data) => {
+        return await axiosInstance.post("/messages/text", data);
+    },
+
+    sendImageMessage: async (conversationId, senderId, file) => {
+        const formData = new FormData();
+        formData.append("conversationId", conversationId);
+        formData.append("senderId", senderId);
+        formData.append("image", file);
+
+        return await axiosInstance.post("/messages/image", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        });
     }
 }

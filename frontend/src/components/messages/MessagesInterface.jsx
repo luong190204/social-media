@@ -24,17 +24,6 @@ const MessagesInterface = () => {
     fetchMessages(conv);
   };
 
-  const handleSendMessage = (content) => {
-    const newMessage = {
-      id: currentMessages.length + 1,
-      type: "text",
-      content: content,
-      sender: "own",
-      time: new Date().toLocaleTimeString(),
-    };
-    setCurrentMessages([...currentMessages, newMessage]);
-  };
-
   return (
     <div className="flex h-screen bg-white">
       {/* Component 1: ChatSidebar */}
@@ -58,7 +47,7 @@ const MessagesInterface = () => {
 
             <ChatContainer messages={messages} />
 
-            <ChatInput onSendMessage={handleSendMessage} />
+            <ChatInput selectConversation={selectConversation} />
           </>
         ) : (
           <NoChatSelected />
