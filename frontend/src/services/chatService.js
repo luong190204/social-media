@@ -17,7 +17,10 @@ export const chatService = {
     },
 
     sendTextMessage: async (data) => {
-        return await axiosInstance.post("/messages/text", data);
+        console.log("Payload gửi đi:", data);
+        return await axiosInstance.post("/messages/text", data, {
+          headers: { "Content-Type": "application/json" },
+        });
     },
 
     sendImageMessage: async (conversationId, senderId, file) => {

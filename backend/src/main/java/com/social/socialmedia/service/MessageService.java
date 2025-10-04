@@ -93,4 +93,9 @@ public class MessageService {
     public Page<Message> getMessages(String conversationId, Pageable pageable) {
         return messageRepository.findByConversationId(conversationId, pageable);
     }
+
+    // Đánh dấu đã đọc tin nhắn
+    public void markMessagesAsRead(String conversationId, String userId) {
+
+    }
 }

@@ -22,7 +22,7 @@ export const useChatStore = create((set) => ({
     try {
       const res = await chatService.fetchMessages(conversation.id);
       set({
-        messages: res.data.result,
+        messages: res.data.result.content || [], // Chỉ lấy array content
         selectConversation: conversation, // Lưu thẳng object
       });
     } catch (error) {
@@ -32,7 +32,7 @@ export const useChatStore = create((set) => ({
     }
   },
 
-  sendTextMessage: async (conversationId, senderId, content) => {
+  sendTextMessage: async ({ conversationId, senderId, content }) => {
     try {
       const res = await chatService.sendTextMessage({
         conversationId,
@@ -41,10 +41,12 @@ export const useChatStore = create((set) => ({
       });
 
       set((state) => ({
-        messages: [...state.messages, res.data.result]
+        messages: [...state.messages, res.data.result],
       }));
     } catch (error) {
+      console.error("Send message error:", error);
       toast.error("Lỗi khi gửi tin nhắn!");
+      throw error;
     }
   },
 
@@ -54,13 +56,13 @@ export const useChatStore = create((set) => ({
         conversationId,
         senderId,
         file,
-      })
+      });
 
       set((state) => ({
         messages: [...state.messages, res.data.result],
-      }))
+      }));
     } catch (error) {
-      toast.error("Lỗi khi gửi ảnh!")
+      toast.error("Lỗi khi gửi ảnh!");
     }
-  }
+  },
 }));

@@ -45,7 +45,7 @@ public class MessageController {
             @RequestParam(defaultValue = "20") int size
     ) {
         var getMessage = messageService.getMessages(conversationId, PageRequest
-                .of(page, size, Sort.by("timestamp").descending()));
+                .of(page, size, Sort.by("timestamp").ascending()));
         return ApiResponse.<Page<Message>>builder()
                 .result(getMessage)
                 .build();

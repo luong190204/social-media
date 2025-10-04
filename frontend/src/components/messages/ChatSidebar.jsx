@@ -47,10 +47,6 @@ export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
             }`}
             onClick={() => onUserSelect(conv)}
           >
-            <button onClick={() => console.log("conv", conv)}>
-              Click
-            </button>
-
             <img
               src={conv.partnerAvatar || "/assets/avatar.jpg"}
               className="w-10 h-10 rounded-full object-cover"

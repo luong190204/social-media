@@ -14,7 +14,11 @@ export default function ChatContainer({ messages }) {
   const { authUser } = useAuthStore();
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const timeout = setTimeout(() => {
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+
+    return () => clearTimeout(timeout);
   }, [messages])
 
   if (isMessagesLoading) {
@@ -29,12 +33,8 @@ export default function ChatContainer({ messages }) {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4 bg-white">
 
-      <button onClick={() => console.log("message: ", messages)
-      }>Test</button>
-
       <div className="max-w-3xl mx-auto space-y-1">
-        {messages?.content?.map((message) => {
-
+        {messages?.map((message) => {
           const isOwnMessage = message.senderId === authUser.id;
           return (
             <div
@@ -42,7 +42,6 @@ export default function ChatContainer({ messages }) {
               className={`flex ${
                 isOwnMessage ? "justify-end" : "justify-start"
               }`}
-              ref={messageEndRef}
             >
               <div
                 className={`flex flex-col max-w-[70%] ${
@@ -54,7 +53,7 @@ export default function ChatContainer({ messages }) {
                   className={`relative px-3 py-2 rounded-3xl break-words ${
                     isOwnMessage
                       ? "bg-blue-500 text-white rounded-br-md"
-                      : "bg-gray-100 text-gray-900 rounded-bl-md"
+                      : "bg-gray-300 text-gray-900 rounded-bl-md"
                   }`}
                 >
                   {message.type === "IMAGE" ? (
@@ -83,6 +82,7 @@ export default function ChatContainer({ messages }) {
             </div>
           );
         })}
+        <div ref={messageEndRef} />
       </div>
     </div>
   );
