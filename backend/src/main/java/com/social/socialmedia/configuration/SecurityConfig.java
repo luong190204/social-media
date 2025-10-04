@@ -43,6 +43,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(request ->
                     request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
                             .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
+                            .requestMatchers("/ws/**").permitAll()
                             .anyRequest().authenticated()) //Còn lại all request phải xác thực
                 .cors(Customizer.withDefaults()); // bật cors
 

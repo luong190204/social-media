@@ -34,5 +34,9 @@ export const chatService = {
                 "Content-Type": "multipart/form-data",
             }
         });
+    },
+
+    markConversationAsRead: async (conversationId) => {
+        return await axiosInstance.put(`/conversations/${conversationId}/read`);
     }
 }

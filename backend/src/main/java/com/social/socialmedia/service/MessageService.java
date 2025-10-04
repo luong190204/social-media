@@ -12,6 +12,7 @@ import com.social.socialmedia.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +29,9 @@ public class MessageService {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     public Message sendTextMessage(MessageRequest request) {
         Conversation conversation = conversationRepository.findById(request.getConversationId()).orElseThrow(
@@ -49,6 +53,9 @@ public class MessageService {
 
         // update conversation
         updateConversation(conversation, message, request.getSenderId());
+
+        // Realtime Socket
+        simpMessagingTemplate.convertAndSend("/topic/conversation/" + request.getConversationId(), message);
         return message;
     }
 
@@ -92,10 +99,5 @@ public class MessageService {
 
     public Page<Message> getMessages(String conversationId, Pageable pageable) {
         return messageRepository.findByConversationId(conversationId, pageable);
-    }
-
-    // Đánh dấu đã đọc tin nhắn
-    public void markMessagesAsRead(String conversationId, String userId) {
-
     }
 }

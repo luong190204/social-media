@@ -5,6 +5,7 @@ import ChatContainer from './ChatContainer';
 import ChatInput from './ChatInput';
 import NoChatSelected from './NoChatSelected';
 import { useChatStore } from '@/store/useChatStore';
+import { connectSocket, disconnectSocket } from '@/lib/socket';
 
 const MessagesInterface = () => {
 
@@ -14,15 +15,37 @@ const MessagesInterface = () => {
     selectConversation,
     fetchConversations,
     fetchMessages,
+    markConversationAsRead,
   } = useChatStore(); 
     
     useEffect(() => {
       fetchConversations();
     }, [fetchConversations]);
 
-  const handleUserSelect = (conv) => {
-    fetchMessages(conv);
+  const handleUserSelect = async (conv) => {
+    // Update đã đọc nếu có unReadCount
+    if (conv.unReadCount > 0) {
+      markConversationAsRead(conv.id);
+    }
+
+    await fetchMessages(conv);
+
+    // Ngắt kết nối WebSocket cũ (nếu có)
+    disconnectSocket();
+
+    // Kết nối WebSocket mới
+    connectSocket(conv.id, (newMessage) => {
+      useChatStore.setState((state) => ({
+        messages: [...state.messages, newMessage],
+      }));
+    });
   };
+
+  useEffect(() => {
+    return () => {
+      disconnectSocket();
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-white">

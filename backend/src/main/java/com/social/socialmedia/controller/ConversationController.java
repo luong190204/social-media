@@ -39,4 +39,14 @@ public class ConversationController {
                 .build();
     }
 
+    // Api cập nhật count TN đã đọc
+    @PutMapping("/{conversationId}/read")
+    public ApiResponse<Void> markConversationAsRead(@PathVariable String conversationId) {
+        conversationService.markConversationAsRead(conversationId);
+
+        return ApiResponse.<Void>builder()
+                .message("Marked as read")
+                .build();
+    }
+
 }

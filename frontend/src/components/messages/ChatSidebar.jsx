@@ -75,7 +75,7 @@ export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
             </div>
 
             {conv.unreadCount > 0 && (
-              <span className="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+              <span className="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex-shrink-0">
                 {conv.unreadCount}
               </span>
             )}

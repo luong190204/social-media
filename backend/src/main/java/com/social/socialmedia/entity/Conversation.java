@@ -20,7 +20,9 @@ public class Conversation {
     @Id
     private String id;
     private List<String> participants;  // List of userId
-    private LocalDateTime createdAt;
     private String lastMessageId;
     private Map<String, Integer> unReadCount;  // Map<userId, count>
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

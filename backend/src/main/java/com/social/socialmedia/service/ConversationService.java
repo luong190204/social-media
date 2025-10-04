@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -90,8 +91,27 @@ public class ConversationService {
                     .partnerAvatar(partner.getProfilePic())
                     .lastMessageContent(lastMessage != null ? lastMessage.getContent() : null)
                     .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
-                    .unreadCount(conv.getUnReadCount().getOrDefault(currentUserId, 0))
+                    .unReadCount(conv.getUnReadCount().getOrDefault(currentUserId, 0))
                     .build();
         }).toList();
+    }
+
+    // Hàm cập nhật unReadCount
+    public void markConversationAsRead(String conversationId) {
+        String currentId = SecurityUtils.getCurrentUserId();
+
+        Conversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_FOUND));
+
+        // Khởi tạo map nếu null
+        if (conversation.getUnReadCount() == null) {
+            conversation.setUnReadCount(new HashMap<>());
+        }
+
+        // Set unreadCount về 0 cho user hiện tại
+        conversation.getUnReadCount().put(currentId, 0);
+        conversation.setUpdatedAt(LocalDateTime.now());
+
+        conversationRepository.save(conversation);
     }
 }

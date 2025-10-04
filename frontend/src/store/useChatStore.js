@@ -2,7 +2,7 @@ import { chatService } from "@/services/chatService";
 import { toast } from "sonner";
 import { create } from "zustand";
 
-export const useChatStore = create((set) => ({
+export const useChatStore = create((set, get) => ({
   conversations: [],
   messages: [],
   selectConversation: null,
@@ -40,9 +40,10 @@ export const useChatStore = create((set) => ({
         content,
       });
 
-      set((state) => ({
-        messages: [...state.messages, res.data.result],
-      }));
+      // Không cần phải push vào state nữa vì Tin nhắn đã được socket trả về
+      // set((state) => ({
+      //   messages: [...state.messages, res.data.result],
+      // }));
     } catch (error) {
       console.error("Send message error:", error);
       toast.error("Lỗi khi gửi tin nhắn!");
@@ -65,4 +66,20 @@ export const useChatStore = create((set) => ({
       toast.error("Lỗi khi gửi ảnh!");
     }
   },
+
+  markConversationAsRead: async (conversationId) => {
+    // Update UI ngay lập tức
+    set((state) => ({
+      conversations: state.conversations.map((conv) => 
+        conv.id === conversationId ? { ...conv, unReadCount: 0 } : conv
+      ),
+    }));
+
+    try {
+      await chatService.markConversationAsRead(conversationId);
+    } catch (error) {
+      console.error("Mark as read error:", error);
+      get().fetchConversations(); // Đồng bộ lại nếu có lỗi
+    }
+  }
 }));

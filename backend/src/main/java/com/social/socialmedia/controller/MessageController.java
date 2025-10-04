@@ -7,7 +7,6 @@ import com.social.socialmedia.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +41,7 @@ public class MessageController {
     public ApiResponse<Page<Message>> getMessages(
             @PathVariable String conversationId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "100") int size
     ) {
         var getMessage = messageService.getMessages(conversationId, PageRequest
                 .of(page, size, Sort.by("timestamp").ascending()));

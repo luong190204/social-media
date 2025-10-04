@@ -10,6 +10,4 @@ import java.util.List;
 
 public interface MessageRepository extends MongoRepository<Message, String> {
     Page<Message> findByConversationId(String conversationId, Pageable pageable);
-
-//    List<Message> findByConversationIdAndSenderIdNotAndIsReadFalse
 }
