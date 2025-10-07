@@ -37,10 +37,22 @@ const ChatInput = ({ selectConversation  }) => {
   const handleSendImage = async () => {
     if (!imageFile) return;
 
-    await sendImageMessage(selectConversation.id, authUser.id, imageFile);
+    setIsSending(true);
 
-    setImageFile(null);
-    setImagePreview(null);
+    try {
+      await sendImageMessage({
+        conversationId: selectConversation.id,
+        senderId: authUser.id,
+        file: imageFile,
+      });
+
+      setImageFile(null);
+      setImagePreview(null);
+    } catch (error) {
+      console.log("Failed to send image: ", error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleSubmit = async (e) => {

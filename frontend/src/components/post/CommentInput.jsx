@@ -42,6 +42,13 @@ const CommentInput = ({
     }
   };
 
+  const handleKeyPress = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  }
+
   return (
     <div className="border-t flex flex-col gap-1 p-3">
       {replyTo && (
@@ -60,6 +67,7 @@ const CommentInput = ({
           type="text"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder="Viết bình luận..."
           className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none"
         />

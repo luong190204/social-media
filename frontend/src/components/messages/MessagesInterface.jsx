@@ -51,7 +51,7 @@ const MessagesInterface = () => {
     <div className="flex h-screen bg-white">
       {/* Component 1: ChatSidebar */}
       <ChatSidebar
-        users={conversations}
+        partner={conversations}
         selectedUser={selectConversation}
         onUserSelect={handleUserSelect}
       />

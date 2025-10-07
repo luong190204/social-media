@@ -51,17 +51,17 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  sendImageMessage: async (conversationId, senderId, file) => {
+  sendImageMessage: async ({ conversationId, senderId, file }) => {
     try {
-      const res = await chatService.sendImageMessage({
+      const res = await chatService.sendImageMessage(
         conversationId,
         senderId,
-        file,
-      });
+        file
+      );
 
-      set((state) => ({
-        messages: [...state.messages, res.data.result],
-      }));
+      // set((state) => ({
+      //   messages: [...state.messages, res.data.result],
+      // }));
     } catch (error) {
       toast.error("Lỗi khi gửi ảnh!");
     }
@@ -70,7 +70,7 @@ export const useChatStore = create((set, get) => ({
   markConversationAsRead: async (conversationId) => {
     // Update UI ngay lập tức
     set((state) => ({
-      conversations: state.conversations.map((conv) => 
+      conversations: state.conversations.map((conv) =>
         conv.id === conversationId ? { ...conv, unReadCount: 0 } : conv
       ),
     }));
@@ -81,5 +81,5 @@ export const useChatStore = create((set, get) => ({
       console.error("Mark as read error:", error);
       get().fetchConversations(); // Đồng bộ lại nếu có lỗi
     }
-  }
+  },
 }));

@@ -1,8 +1,7 @@
 import { MoreVertical, Search } from 'lucide-react';
 import React, { useEffect } from 'react'
 
-export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
-
+export const ChatSidebar = ({ partner, selectedUser, onUserSelect }) => {
   return (
     <div className="hidden md:block w-[400px] border-r border-gray-200 overflow-y-auto">
       {/* Header */}
@@ -30,16 +29,16 @@ export const ChatSidebar = ({ users, selectedUser, onUserSelect }) => {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Tin nhắn</h2>
           <div className="text-sm text-gray-500">Tin nhắn đang chờ</div>
-        </div>
+        </div>   
       </div>
 
       {/* Conversations List */}
-      {users.length === 0 ? (
+      {partner.length === 0 ? (
         <p className="p-4 text-gray-500 text-sm text-center">
           Chưa có cuộc trò chuyện nào
         </p>
       ) : (
-        users.map((conv) => (
+        partner.map((conv) => (
           <div
             key={conv.id}
             className={`flex items-center p-3 cursor-pointer ${

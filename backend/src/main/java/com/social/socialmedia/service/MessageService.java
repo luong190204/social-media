@@ -82,6 +82,9 @@ public class MessageService {
 
         // Update conversation
         updateConversation(conversation, message, senderId);
+
+        // Realtime Socket
+        simpMessagingTemplate.convertAndSend("/topic/conversation/" + conversationId, message);
         return message;
     }
 
