@@ -60,10 +60,10 @@ export default function ChatContainer({ messages }) {
               >
                 {/* Message Bubble */}
                 <div
-                  className={`relative px-3 py-2 rounded-3xl break-words ${
+                  className={`relative  rounded-3xl break-words ${
                     isOwnMessage
                       ? "bg-blue-500 text-white rounded-br-md"
-                      : "bg-gray-100 text-gray-900 rounded-bl-md"
+                      : "bg-gray-300 text-gray-900 rounded-bl-md"
                   }`}
                 >
                   {message.type === "IMAGE" ? (
@@ -73,7 +73,7 @@ export default function ChatContainer({ messages }) {
                       className="rounded-2xl max-w-full h-auto max-h-80 object-cover cursor-pointer hover:opacity-95 transition-opacity"
                     />
                   ) : (
-                    <p className="text-[15px] leading-5 whitespace-pre-wrap">
+                    <p className="text-[15px] px-3 py-2 leading-5 whitespace-pre-wrap">
                       {message.content}
                     </p>
                   )}

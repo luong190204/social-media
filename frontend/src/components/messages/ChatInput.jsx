@@ -1,7 +1,9 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import { useChatStore } from '@/store/useChatStore';
 import { Camera, Heart, Send, Smile, X } from 'lucide-react';
-import React, { useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
+
+const EmojiPicker = React.lazy(() => import("emoji-picker-react"));
 
 const ChatInput = ({ selectConversation  }) => {
   const { authUser } = useAuthStore();
@@ -11,6 +13,9 @@ const ChatInput = ({ selectConversation  }) => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [ShowEmoji, setShowEmoji] = useState(false);
+  const emojiRef = useRef(null);
 
   const [isSending, setIsSending] = useState(false); // Thêm loading state
 
@@ -82,6 +87,39 @@ const ChatInput = ({ selectConversation  }) => {
     }
   };
 
+  // Emoji
+  const handleEmojiClick = (emojiData) => {
+    setText((prev) => prev +  emojiData.emoji)
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setShowEmoji(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [])
+
+  // Heat content
+  const handleSendHeart  = async () => {
+    setIsSending(true);
+    
+    try {
+      await sendTextMessage({
+        conversationId: selectConversation.id,
+        senderId: authUser.id,
+        content: "❤️",
+      });
+    } catch (error) {
+      console.log("Fail send heart", error);
+    } finally {
+      setIsSending(false);
+    }
+  }
+
   return (
     <div className="border-t bg-white">
       <div className="p-4">
@@ -110,7 +148,8 @@ const ChatInput = ({ selectConversation  }) => {
         <form onSubmit={handleSubmit} className="flex items-center space-x-3">
           <Camera
             className={`w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-500 ${
-              isSending ? 'opacity-50 cursor-not-allowed' : ''}`}
+              isSending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={() => !isSending && fileInputRef.current.click()}
           />
           <div className="flex-1 relative">
@@ -136,7 +175,29 @@ const ChatInput = ({ selectConversation  }) => {
             </div>
 
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-              <Smile className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-500" />
+              {/* Emoji picker */}
+              <div ref={emojiRef} className='relative'>
+                <Smile
+                  className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-500"
+                  onClick={() => setShowEmoji((prev) => !prev)}
+                />
+
+                {ShowEmoji && (
+                  <div className="absolute bottom-10 right-0 z-50">
+                    <Suspense
+                      fallback={
+                        <div className="text-sm text-gray-400">Load emoji</div>
+                      }
+                    >
+                      <EmojiPicker
+                        onEmojiClick={handleEmojiClick}
+                        theme="light"
+                      />
+                    </Suspense>
+                  </div>
+                )}
+              </div>
+
               {text.trim() || imageFile ? (
                 <button type="submit" disabled={isSending}>
                   <Send
@@ -146,11 +207,11 @@ const ChatInput = ({ selectConversation  }) => {
                   />
                 </button>
               ) : (
-                <Heart className="w-5 h-5 text-gray-400 cursor-pointer hover:text-red-500" />
+                <Heart className="w-5 h-5 text-gray-400 cursor-pointer hover:text-red-500" onClick={handleSendHeart}/>
               )}
             </div>
           </div>
-        </form>
+        </form> 
       </div>
     </div>
   );
