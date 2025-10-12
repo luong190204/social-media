@@ -8,6 +8,8 @@ import LikeButton from "./LikeButton";
 import { usePostStore } from "@/store/usePostStore";
 import CommentDialog from "./CommentDialog";
 import { useCommentStore } from "@/store/useCommentStore ";
+import { useParams } from "react-router-dom";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const PortCard = ({ post }) => {
 
@@ -18,6 +20,11 @@ const PortCard = ({ post }) => {
 
   const [openComment, setOpenComment] = useState(false);
   
+  // Todo: ẩn khi xem profile của người khác
+  const { userId } = useParams();
+  const { authUser } = useAuthStore();
+  const isMyProfile = !userId || userId === authUser?.id;
+
   // Lấy ra số lượng bình luận từ store
   const { commentCountByPost, fetchCommentCountByPost } = useCommentStore();
   useEffect(() => {
@@ -68,13 +75,17 @@ const PortCard = ({ post }) => {
           </div>
         </div>
 
-        <Button
-          onClick={() => setIsMenuOpen(true)}
-          variant="ghost"
-          className="h-auto "
-        >
+        {isMyProfile ? (
+          <Button
+            onClick={() => setIsMenuOpen(true)}
+            variant="ghost"
+            className="h-auto "
+          >
           <MoreHorizontal />
         </Button>
+        ) : (
+          ""
+        )}
       </div>
 
       <PostMoreMenu

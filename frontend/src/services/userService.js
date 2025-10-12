@@ -1,8 +1,12 @@
 import { axiosInstance } from "@/lib/axios"
 
 export const userService = {
-    getProfile: async () => {
+    getMyProfile: async () => {
         return await axiosInstance.get("/users/my-info");
+    },
+
+    getProfileUser: async (userId) => {
+        return await axiosInstance.get(`/users/${userId}`);
     },
 
     updateAvatar: async (formData) => {

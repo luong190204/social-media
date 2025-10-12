@@ -98,7 +98,7 @@ public class PostService {
                 .map(postMapper::toPostResponse).toList();
     }
 
-    // Lấy tất cả posts của 1 user
+    // Lấy tất cả posts của user đang login
     public List<PostResponse> getAllPostByUser() {
         String currentUserId = SecurityUtils.getCurrentUserId();
 
@@ -120,6 +120,34 @@ public class PostService {
 
                     response.setTotalLikes(totalLikes);
                     response.setLikedByMe(likedByMe);
+                    return response;
+                }).toList();
+    }
+
+    // Lấy post của user bằng userId
+    public List<PostResponse> getAllPostByUserId(String userId) {
+        String currentUserId = SecurityUtils.getCurrentUserId(); // check likeByMe
+
+        Sort sortByCreationDateDesc = Sort.by(Sort.Direction.DESC, "createdAt");
+
+        return postRepository.findByAuthorId(userId, sortByCreationDateDesc).stream()
+                .map(post -> {
+                    PostResponse response = postMapper.toPostResponse(post);
+                    User user = userRepository.findById(post.getAuthorId())
+                            .orElseThrow(() -> new AppException(ErrorCode.USER_EXISTED));
+
+                    response.setAuthor(UserResponse.builder()
+                                    .id(user.getId())
+                                    .username(user.getUsername())
+                                    .profilePic(user.getProfilePic())
+                            .build());
+
+                    int totalLikes = postLikeRepository.countByPostId(post.getId());
+                    boolean likedByMe = postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId);
+
+                    response.setTotalLikes(totalLikes);
+                    response.setLikedByMe(likedByMe);
+
                     return response;
                 }).toList();
     }

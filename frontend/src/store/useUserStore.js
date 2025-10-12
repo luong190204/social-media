@@ -11,7 +11,7 @@ export const useUserStore = create ((set) => ({
     fetchMyProfile: async () =>  {
         set({ isLoadingProfile: true })
         try {
-            const res = await userService.getProfile();
+            const res = await userService.getMyProfile();
             set({ userProfile: res.data.result })
         } catch (error) {
             toast.error("Lỗi không load được profile")
@@ -19,6 +19,19 @@ export const useUserStore = create ((set) => ({
         } finally {
             set({ isLoadingProfile: false })
         } 
+    },
+
+    fetchProfileUser: async (userId) => {
+        set({ isLoadingProfile: true })
+        try {
+            const res = await userService.getProfileUser(userId);
+            set({ userProfile: res.data.result })
+        } catch (error) {
+            toast.error("Lỗi không load được profile")
+            set({ userProfile: null })
+        } finally {
+            set({ isLoadingProfile: false })
+        }
     },
 
     updateAvatar: async (data) => {

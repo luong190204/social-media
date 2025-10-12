@@ -53,7 +53,7 @@ import java.util.List;
         @GetMapping("/{userId}")
         ApiResponse<UserResponse> getUser(@PathVariable String userId) {
             return ApiResponse.<UserResponse>builder()
-                    .result(userService.getUser(userId))
+                    .result(userService.getInfoUser(userId))
                     .build();
 
         }

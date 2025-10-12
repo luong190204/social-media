@@ -5,27 +5,40 @@ import React, { useEffect, useState } from "react";
 
 import PostCard from "../components/post/PortCard";
 import CreatePost from "@/components/post/CreatePost";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const ProfilePage = () => {
 
   const navigate = useNavigate();
 
+  const { userId } = useParams();
+
   const {
     userProfile,
     isLoadingProfile,
     fetchMyProfile,
+    fetchProfileUser,
     isUpdatingProfile,
     updateAvatar,
   } = useUserStore();
+
   const { posts, isPostsLoading, fetchPosts } = usePostStore();
 
-  useEffect(() => {
-    fetchMyProfile();
-  }, []);
+  const { authUser } = useAuthStore();
+
+  const isMyProfile = !userId || userId === authUser?.id;
 
   useEffect(() => {
-    fetchPosts();
+    if (userId) {
+      fetchProfileUser(userId);
+    } else {
+      fetchMyProfile();
+    }
+  }, [userId, fetchMyProfile, fetchProfileUser]);
+
+  useEffect(() => {
+    fetchPosts(userId);
   }, [fetchPosts]);
 
   const handleImageUpload = async (e) => {
@@ -94,26 +107,44 @@ const ProfilePage = () => {
         <div className="flex-1">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-semibold">{userProfile?.username}</h2>
-            <button
-              className="px-4 py-1 flex items-center gap-2"
-              onClick={() => navigate("/edit-profile")}
-            >
-              <span>Chỉnh sửa trang cá nhân</span>
-              <p>
-                <Settings size={18} />
-              </p>
-            </button>
+            {isMyProfile ? (
+              <button
+                className="px-4 py-1 flex items-center gap-2"
+                onClick={() => navigate("/edit-profile")}
+              >
+                <span>Chỉnh sửa trang cá nhân</span>
+                <p>
+                  <Settings size={18} />
+                </p>
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  className="px-4 py-1 bg-blue-500 text-white rounded-md"
+                  // onClick={() => handleFollow(userProfile.id)}
+                >
+                  Theo dõi
+                </button>
+                <button
+                  className="px-4 py-1 bg-pink-600 text-white rounded-md"
+                  // onClick={() => handleFollow(userProfile.id)}
+                >
+                  Nhắn tin
+                </button>
+              </div>
+            )}
           </div>
           <p className="font-normal">{userProfile?.fullName}</p>
           <div className="flex gap-6 mt-4">
             <span>
               <b>{posts.length || 0}</b> bài viết
             </span>
+
             <span>
-              <b>{userProfile?.followersCount || 0}</b> người theo dõi
+              <b>{userProfile?.followers.length || 0}</b> người theo dõi
             </span>
             <span>
-              Đang theo dõi <b>{userProfile?.followingCount || 0}</b> người dùng
+              Đang theo dõi <b>{userProfile?.following.length || 0}</b> người dùng
             </span>
           </div>
 
@@ -145,7 +176,7 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      <CreatePost />
+      {isMyProfile ? <CreatePost /> : ""}
 
       <div className="max-w-xl mx-auto mt-6">
         {posts.length > 0 ? (

@@ -42,6 +42,14 @@ public class PostController {
                 .build();
     }
 
+    @GetMapping("/user/{userId}")
+    public ApiResponse<List<PostResponse>> getAllPostByUserId(@PathVariable String userId) {
+        return ApiResponse.<List<PostResponse>>builder()
+                .result(postService.getAllPostByUserId(userId))
+                .build();
+    }
+
+
     @PutMapping("/{postId}")
     public ApiResponse<PostResponse> updatePost(@PathVariable String postId, @Valid
                                                 @RequestBody PostUpdateRequest request) {

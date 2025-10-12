@@ -13,6 +13,10 @@ export const postService = {
         return await axiosInstance.get("/posts/user")
     },
 
+    getAllPostByUserId: async (userId) => {
+      return await axiosInstance.get(`/posts/user/${userId}`)  
+    },
+
     getPostById: async (postId) => {
         return await axiosInstance.get("/${postId}")
     },

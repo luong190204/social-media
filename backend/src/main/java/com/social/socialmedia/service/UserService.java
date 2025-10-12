@@ -63,8 +63,8 @@ public class UserService {
                 .map(userMapper::toUserResponse).toList();
     }
 
-    @PostAuthorize("returnObject.username == authentication.name")
-    public UserResponse getUser(String id) {
+    //@PostAuthorize("returnObject.username == authentication.name")
+    public UserResponse getInfoUser(String id) {
         return userMapper.toUserResponse(userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_FOUND)));
     }
