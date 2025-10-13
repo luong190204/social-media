@@ -1,12 +1,14 @@
 import { axiosInstance } from "@/lib/axios";
+import { followService } from "@/services/followService";
 import { userService } from "@/services/userService";
 import { toast } from "sonner";
 import { create } from "zustand";
 
-export const useUserStore = create ((set) => ({
+export const useUserStore = create ((set, get) => ({
     userProfile: null,
     isLoadingProfile: false,
     isUpdatingProfile: false,
+    isFollowLoading: false,
 
     fetchMyProfile: async () =>  {
         set({ isLoadingProfile: true })
@@ -59,6 +61,42 @@ export const useUserStore = create ((set) => ({
         } finally {
             set({ isUpdatingProfile: false });
         }
-    }
+    },
+
+    
+    toggleFollowUser: async (authUserId) => {
+        const { userProfile } = get();
+        if (!userProfile) return;
+
+        set({ isFollowLoading: true });
+
+        try {
+            const isFollowing = userProfile.followers.includes(authUserId);
+            if (isFollowing) {
+                await followService.unfollow(userProfile.id);
+                set({
+                  userProfile: {
+                    ...userProfile,
+                    followers: userProfile.followers.filter(
+                      (id) => id != authUserId
+                    ),
+                  },
+                });
+            } else {
+                await followService.follow(userProfile.id);
+                set({
+                  userProfile: {
+                    ...userProfile,
+                    followers: [...userProfile.followers, authUserId],
+                  },
+                });
+            }
+        } catch (error) {
+            console.error("Follow/unfollow error:", error);
+        } finally {
+            set({ isFollowLoading: false });
+        }
+
+    },
 
 }))

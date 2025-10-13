@@ -22,6 +22,7 @@ public enum ErrorCode {
         CONVERSATION_NOT_FOUND(1013, "Conversation not found", HttpStatus.BAD_REQUEST),
         RECEIVER_NOT_FOUND(1014, "Receiver not found", HttpStatus.BAD_REQUEST),
         PARTICIPANTS_NOT_TWO(1015, "Chat 1-1 must have exactly 2 participants", HttpStatus.BAD_REQUEST),
+        NOTIFICATION_NOT_FOUND(1016, "Notification not found", HttpStatus.BAD_REQUEST),
     ;
 
 

@@ -27,9 +27,13 @@ const LoginPage = () => {
     e.preventDefault();
 
     login(formData);
+  }
 
-    console.log(formData);
-    
+  const handleKeyPress = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
   }
 
   return (
@@ -82,6 +86,7 @@ const LoginPage = () => {
                 type='button'
                 className='absolute right-0 inset-y-0 pr-3 flex items-center'
                 onClick={() => setShowPassword(!showPassword)}
+                onKeyDown={handleKeyPress}
               >
                 {showPassword ? (
                   <EyeOff className='size-5'/>

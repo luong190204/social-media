@@ -21,11 +21,15 @@ const ProfilePage = () => {
     fetchProfileUser,
     isUpdatingProfile,
     updateAvatar,
+    toggleFollowUser,
+    isFollowLoading,
   } = useUserStore();
 
   const { posts, isPostsLoading, fetchPosts } = usePostStore();
 
   const { authUser } = useAuthStore();
+
+  const isFollowing = userProfile?.followers?.includes(authUser.id)
 
   const isMyProfile = !userId || userId === authUser?.id;
 
@@ -120,10 +124,11 @@ const ProfilePage = () => {
             ) : (
               <div className="flex gap-2">
                 <button
-                  className="px-4 py-1 bg-blue-500 text-white rounded-md"
-                  // onClick={() => handleFollow(userProfile.id)}
+                  className={`px-4 py-2 rounded-md ${isFollowing ? "bg-gray-300" : "bg-blue-500 text-white"}`}
+                  onClick={() => toggleFollowUser(authUser.id)}
+                  disabled={isFollowLoading}
                 >
-                  Theo dõi
+                  {isFollowing ? "Đang theo dõi" : "Theo dõi"}
                 </button>
                 <button
                   className="px-4 py-1 bg-pink-600 text-white rounded-md"
@@ -136,6 +141,7 @@ const ProfilePage = () => {
           </div>
           <p className="font-normal">{userProfile?.fullName}</p>
           <div className="flex gap-6 mt-4">
+            <button onClick={() => console.log(userProfile)}>Click</button>
             <span>
               <b>{posts.length || 0}</b> bài viết
             </span>
@@ -144,7 +150,8 @@ const ProfilePage = () => {
               <b>{userProfile?.followers.length || 0}</b> người theo dõi
             </span>
             <span>
-              Đang theo dõi <b>{userProfile?.following.length || 0}</b> người dùng
+              Đang theo dõi <b>{userProfile?.following.length || 0}</b> người
+              dùng
             </span>
           </div>
 
