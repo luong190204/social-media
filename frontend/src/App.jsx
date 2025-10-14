@@ -12,13 +12,46 @@ import MessagesInterface from "./components/messages/MessagesInterface";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
+import { UseNotificationStore } from "./store/useNotificationStore";
+import { connectNotificationSocket, disconnectNotificationSocket } from "./lib/notificationSocket";
+import { toast } from "sonner";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
+  const { addNotification } = UseNotificationStore();
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Realtime notification 
+  useEffect(() => {
+    if (!authUser) return;
+
+    connectNotificationSocket((newNotification) => {
+      addNotification(newNotification);
+
+      toast.success(
+        <div className="flex items-center space-x-3">
+          <img
+            src={newNotification.senderAvatar || "/assets/avatar.jpg"}
+            alt="avatar"
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <div>
+            <p className="font-semibold text-sm">
+              {newNotification.senderName}
+            </p>
+            <p className="text-xs text-gray-600">{newNotification.message}</p>
+          </div>
+        </div>,
+        { duration: 4000 }
+      );
+    });
+
+    return () => disconnectNotificationSocket();
+  }, [authUser]);
 
   // Hiển thị Loader nếu đang trong quá trình kiểm tra
   if (isCheckingAuth) {

@@ -25,6 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*") // Cho phép frontend connect
                 .addInterceptors(new JwtHandshakeInterceptor())
+                .setHandshakeHandler(new UserHandshakeHandler())
                 .withSockJS(); // Hỗ trợ fallback
     }
 }

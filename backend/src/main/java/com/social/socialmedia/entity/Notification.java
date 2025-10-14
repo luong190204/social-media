@@ -25,7 +25,6 @@ public class Notification {
     private String senderId; // người tạo hành động
     private String type;
     private String postId;
-    private String commentId;
     private boolean isRead;
     private String message;
 

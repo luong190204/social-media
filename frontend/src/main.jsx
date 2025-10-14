@@ -10,7 +10,14 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <App />
-      <Toaster position="top-right" richColors closeButton/>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        toastOptions={{
+          className: "rounded-xl shadow-lg border bg-white/90 backdrop-blur-sm",
+        }}
+      />
     </BrowserRouter>
   </StrictMode>
 );

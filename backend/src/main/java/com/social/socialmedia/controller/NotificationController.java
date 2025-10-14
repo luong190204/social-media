@@ -1,6 +1,7 @@
 package com.social.socialmedia.controller;
 
 import com.social.socialmedia.dto.request.ApiResponse;
+import com.social.socialmedia.dto.response.NotificationResponse;
 import com.social.socialmedia.entity.Notification;
 import com.social.socialmedia.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,8 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @GetMapping
-    public ApiResponse<List<Notification>> getUserNotifications() {
-        return ApiResponse.<List<Notification>>builder()
+    public ApiResponse<List<NotificationResponse>> getUserNotifications() {
+        return ApiResponse.<List<NotificationResponse>>builder()
                 .result(notificationService.getUserNotifications())
                 .build();
     }

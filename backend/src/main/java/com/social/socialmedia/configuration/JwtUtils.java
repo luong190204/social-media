@@ -18,10 +18,9 @@ public class JwtUtils {
         try {
             Jwt decoded = jwtDecoder.decode(token);
 
-            // ⚠️ Tuỳ theo lúc tạo token mà key trong claims có thể là "sub", "id", "username"...
             Object idClaim = decoded.getClaims().get("id");
             if (idClaim == null) idClaim = decoded.getClaims().get("sub");
-            if (idClaim == null) idClaim = decoded.getClaims().get("userId");
+            if (idClaim == null) idClaim = decoded.getClaims().get("id");
             if (idClaim == null) idClaim = decoded.getClaims().get("username");
 
             return idClaim != null ? idClaim.toString() : null;

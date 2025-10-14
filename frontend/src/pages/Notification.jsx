@@ -1,36 +1,31 @@
 import { connectNotificationSocket, disconnectNotificationSocket } from '@/lib/notificationSocket';
 import { UseNotificationStore } from '@/store/useNotificationStore'
 import React, { useEffect } from 'react'
+import { toast } from 'sonner';
 
 const Notification = () => {
 
     const {
       notifications,
       fetchNotifications,
-      addNotification,
       markAsRead,
       isLoading,
     } = UseNotificationStore();
 
     useEffect(() => {
-
-        // Load thông báo 
-        fetchNotifications();
-
-        // Connect socket
-        connectNotificationSocket((newNotification) => {
-            addNotification(newNotification);
-        });
-
-        return () => disconnectNotificationSocket();
-    }, [])
+      // Load thông báo
+      fetchNotifications();
+  
+    }, []);
 
   return (
     <div className="relative">
+      <button onClick={() => console.log(notifications)
+      }>vvv</button>
       <button className="relative">
-        🔔
-        {notifications.some((n) => !n.isRead) && (
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+        Thông báo
+        {notifications.some((n) => !n.read) && (
+          <span className="absolute top-0 w-2 h-2 bg-red-500 rounded-full"></span>
         )}
       </button>
 

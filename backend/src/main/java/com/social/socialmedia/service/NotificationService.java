@@ -1,5 +1,6 @@
 package com.social.socialmedia.service;
 
+import com.social.socialmedia.dto.response.NotificationResponse;
 import com.social.socialmedia.entity.Notification;
 import com.social.socialmedia.entity.User;
 import com.social.socialmedia.exception.AppException;
@@ -62,13 +63,30 @@ public class NotificationService {
         createNotification(receiverId, senderId, "COMMENT", postId, message);
     }
 
-    public List<Notification> getUserNotifications() {
+    public List<NotificationResponse> getUserNotifications() {
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new AppException(ErrorCode.USER_FOUND));
 
-        return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(user.getId());
+        var notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(user.getId());
+
+        // Convert sang dto kèm thông tin người dùng
+        return notifications.stream().map(notification -> {
+            User sender = userRepository.findById(notification.getSenderId()).orElse(null);
+
+            return NotificationResponse.builder()
+                    .id(notification.getId())
+                    .message(notification.getMessage())
+                    .type(notification.getType())
+                    .postId(notification.getPostId())
+                    .createdAt(notification.getCreatedAt())
+                    .isRead(notification.isRead())
+                    .senderId(notification.getSenderId())
+                    .senderName(sender != null ? sender.getFullName() : "Người dùng")
+                    .senderAvatar(sender != null ? sender.getProfilePic() : null)
+                    .build();
+        }).toList();
     }
 
     public void markAsRead(String notificationId) {

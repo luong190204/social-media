@@ -141,7 +141,6 @@ const ProfilePage = () => {
           </div>
           <p className="font-normal">{userProfile?.fullName}</p>
           <div className="flex gap-6 mt-4">
-            <button onClick={() => console.log(userProfile)}>Click</button>
             <span>
               <b>{posts.length || 0}</b> bài viết
             </span>

@@ -1,4 +1,4 @@
-// Tạo interceptor để lấy token từ URL query (websocket)
+// Tạo interceptor để lấy token từ URL query và lưu vào attributes (websocket)
 package com.social.socialmedia.configuration;
 
 import org.springframework.http.server.ServerHttpRequest;
