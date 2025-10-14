@@ -24,8 +24,6 @@ import com.social.socialmedia.repository.PostLikeRepository;
 import com.social.socialmedia.repository.PostRepository;
 import com.social.socialmedia.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.security.SecurityUtil;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,6 +63,9 @@ public class PostService {
 
     @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public PostResponse createPost(PostCreateRequest request, MultipartFile[] files) {
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -174,6 +175,9 @@ public class PostService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_FOUND));
+
         // Check xem đã like chưa
         boolean alreadyLiked = postLikeRepository.existsByPostIdAndUserId(postId, user.getId());
 
@@ -185,6 +189,16 @@ public class PostService {
                     .userId(user.getId())
                     .build();
             postLikeRepository.save(postLike);
+
+            // Notification
+            if (!post.getAuthorId().equals(user.getId())) {
+                notificationService.createLikeNotification(
+                        post.getAuthorId(), // Người nhận thông báo
+                        user.getId(), // Người gửi thng báo
+                        user.getFullName(),
+                        postId
+                );
+            }
         }
 
         // Count like
@@ -205,7 +219,8 @@ public class PostService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_FOUND));
 
         // Map request -> entity
         Comment comment = commentMapper.toComment(request);
@@ -214,8 +229,19 @@ public class PostService {
         comment.setPostId(postId);
         comment.setStatus(CommentStatus.ACTIVE);
 
+        Comment saved = commentPostRepository.save(comment);
+
+        if (!post.getAuthorId().equals(user.getId())) {
+            notificationService.createCommentNotification(
+                    post.getAuthorId(),
+                    user.getId(),
+                    user.getFullName(),
+                    postId
+            );
+        }
+
         // Map sang response
-        CommentResponse response = commentMapper.toCommentResponse(commentPostRepository.save(comment));
+        CommentResponse response = commentMapper.toCommentResponse(saved);
         response.setAuthorName(user.getUsername());
         response.setAuthorAvatar(user.getProfilePic());
 

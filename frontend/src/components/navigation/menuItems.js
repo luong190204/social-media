@@ -7,7 +7,7 @@ export const sidebarItems = [
   { id: "explore", label: "Khám phá", icon: Compass, path: "/explore" },
   { id: "reels", label: "Reels", icon: Video, path: "/reels" },
   { id: "messages", label: "Tin nhắn", icon: MessageCircle, path: "/messages", hasBadge: true },
-  { id: "notifications", label: "Thông báo", icon: Heart, action: "notifications", hasBadge: true },
+  { id: "notifications", label: "Thông báo", icon: Heart, path: "/notification" , action: "notifications", hasBadge: true },
   { id: "create", label: "Tạo", icon: PlusSquare, action: "create" },
   { id: "profile", label: "Trang cá nhân", icon: User, path: "/profile", isAvatar: true },
 ];

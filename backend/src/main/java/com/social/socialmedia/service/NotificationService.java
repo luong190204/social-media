@@ -1,11 +1,14 @@
 package com.social.socialmedia.service;
 
 import com.social.socialmedia.entity.Notification;
+import com.social.socialmedia.entity.User;
 import com.social.socialmedia.exception.AppException;
 import com.social.socialmedia.exception.ErrorCode;
 import com.social.socialmedia.repository.NotificationRepository;
+import com.social.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +18,9 @@ import java.util.List;
 public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -27,7 +33,7 @@ public class NotificationService {
                 .postId(postId)
                 .isRead(false)
                 .message(message)
-                .createAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         notificationRepository.save(notification);
@@ -40,8 +46,29 @@ public class NotificationService {
         );
     }
 
-    public List<Notification> getUserNotifications(String userId) {
-        return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(userId);
+    // Helper cho từng loại notification
+    public void createFollowNotification(String receiverId, String senderId, String senderName) {
+        String message = senderName + " đã bắt đầu theo dõi bạn.";
+        createNotification(receiverId, senderId, "FOLLOW", null, message);
+    }
+
+    public void createLikeNotification(String receiverId, String senderId, String senderName, String postId) {
+        String message = senderName + " đã thích bài viết của bạn.";
+        createNotification(receiverId, senderId, "LIKE", postId, message);
+    }
+
+    public void createCommentNotification(String receiverId, String senderId, String senderName, String postId) {
+        String message = senderName + " đã bình luận về bài viết của bạn.";
+        createNotification(receiverId, senderId, "COMMENT", postId, message);
+    }
+
+    public List<Notification> getUserNotifications() {
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.USER_FOUND));
+
+        return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(user.getId());
     }
 
     public void markAsRead(String notificationId) {

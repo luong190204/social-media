@@ -22,6 +22,9 @@ public class FollowService {
     @Autowired
     private FollowMapper followMapper;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public void follow(String targetId) {
         // Lấy user hiện tại từ jwt
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -39,7 +42,14 @@ public class FollowService {
 
             userRepository.save(follower);
             userRepository.save(target);
-        }
+
+            // Notification
+            notificationService.createFollowNotification(
+                    target.getId(), //Người nhận thông báo
+                    follower.getId(), // Người gửi thông báo
+                    follower.getFullName()
+            );
+        };
     }
 
     public void unfollow(String targetId) {

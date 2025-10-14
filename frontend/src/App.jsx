@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
 import EditProfile from "./pages/editProfile";
 import ProfilePage from "./pages/ProfilePage";
+import Notification from "./pages/Notification";
 import MessagesInterface from "./components/messages/MessagesInterface";
 
 import { useAuthStore } from "./store/useAuthStore";
@@ -51,6 +52,7 @@ function App() {
         <Route path="/profile/:userId" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/messages" element={<MessagesInterface />} />
+        <Route path="/notification" element={<Notification />}/>
       </Route>
       {/* Người dùng đã đăng nhập sẽ không cần truy cập trang Auth */}
       <Route path="/login" element={<Navigate to="/" />} />

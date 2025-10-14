@@ -30,5 +30,5 @@ public class Notification {
     private String message;
 
     @CreatedDate
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 }
