@@ -47,7 +47,8 @@ public class FollowService {
             notificationService.createFollowNotification(
                     target.getId(), //Người nhận thông báo
                     follower.getId(), // Người gửi thông báo
-                    follower.getFullName()
+                    follower.getFullName(),
+                    follower.getProfilePic()
             );
         };
     }

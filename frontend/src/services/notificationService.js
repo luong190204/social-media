@@ -6,6 +6,12 @@ export const notificationService = {
     },
 
     markAsRead: async (notificationId) => {
-        return await axiosInstance.post(`/${notificationId}/read`);
+        return await axiosInstance.post(
+          `/notifications/${notificationId}/read`
+        );
+    },
+
+    markAllAsRead: async () => {
+        return await axiosInstance.post("/notifications/read-all")
     }
 }

@@ -1,5 +1,6 @@
 package com.social.socialmedia.controller;
 
+import com.social.socialmedia.configuration.SecurityUtils;
 import com.social.socialmedia.dto.request.ApiResponse;
 import com.social.socialmedia.dto.response.NotificationResponse;
 import com.social.socialmedia.entity.Notification;
@@ -23,7 +24,21 @@ public class NotificationController {
     }
 
     @PostMapping("/{id}/read")
-    public void markAsRead(@PathVariable String notificationId) {
-        notificationService.markAsRead(notificationId);
+    public ApiResponse<Void> markAsRead(@PathVariable String id) {
+        notificationService.markAsRead(id);
+
+        return ApiResponse.<Void>builder()
+                .message("Đánh dấu đã đọc thành công")
+                .build();
+    }
+
+    @PostMapping("/read-all")
+    public ApiResponse<Void> markAllAsRead() {
+        String userId = SecurityUtils.getCurrentUserId();
+
+        notificationService.markAllAsRead(userId);
+        return ApiResponse.<Void>builder()
+                .message("Đánh dấu tất cả thành công")
+                .build();
     }
 }

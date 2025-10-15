@@ -196,6 +196,7 @@ public class PostService {
                         post.getAuthorId(), // Người nhận thông báo
                         user.getId(), // Người gửi thng báo
                         user.getFullName(),
+                        user.getProfilePic(),
                         postId
                 );
             }
@@ -236,6 +237,7 @@ public class PostService {
                     post.getAuthorId(),
                     user.getId(),
                     user.getFullName(),
+                    user.getProfilePic(),
                     postId
             );
         }

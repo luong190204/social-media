@@ -23,6 +23,8 @@ public class Notification {
 
     private String receiverId; // người nhận tb
     private String senderId; // người tạo hành động
+    private String senderName;
+    private String senderAvatar;
     private String type;
     private String postId;
     private boolean isRead;

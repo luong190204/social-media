@@ -26,10 +26,12 @@ public class NotificationService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    public void createNotification(String receiverId, String senderId, String type, String postId, String message) {
+    public void createNotification(String receiverId, String senderId, String senderName, String senderAvatar,String type, String postId, String message) {
         Notification notification = Notification.builder()
                 .receiverId(receiverId)
                 .senderId(senderId)
+                .senderName(senderName)
+                .senderAvatar(senderAvatar)
                 .type(type)
                 .postId(postId)
                 .isRead(false)
@@ -48,19 +50,19 @@ public class NotificationService {
     }
 
     // Helper cho từng loại notification
-    public void createFollowNotification(String receiverId, String senderId, String senderName) {
+    public void createFollowNotification(String receiverId, String senderId, String senderName, String senderAvatar) {
         String message = senderName + " đã bắt đầu theo dõi bạn.";
-        createNotification(receiverId, senderId, "FOLLOW", null, message);
+        createNotification(receiverId, senderId, senderName, senderAvatar, "FOLLOW", null, message);
     }
 
-    public void createLikeNotification(String receiverId, String senderId, String senderName, String postId) {
+    public void createLikeNotification(String receiverId, String senderId, String senderName, String senderAvatar, String postId) {
         String message = senderName + " đã thích bài viết của bạn.";
-        createNotification(receiverId, senderId, "LIKE", postId, message);
+        createNotification(receiverId, senderId, senderName, senderAvatar, "LIKE", postId, message);
     }
 
-    public void createCommentNotification(String receiverId, String senderId, String senderName, String postId) {
+    public void createCommentNotification(String receiverId, String senderId, String senderName, String senderAvatar, String postId) {
         String message = senderName + " đã bình luận về bài viết của bạn.";
-        createNotification(receiverId, senderId, "COMMENT", postId, message);
+        createNotification(receiverId, senderId, senderName, senderAvatar,"COMMENT", postId, message);
     }
 
     public List<NotificationResponse> getUserNotifications() {
@@ -94,5 +96,12 @@ public class NotificationService {
                 () -> new AppException(ErrorCode.NOTIFICATION_NOT_FOUND));
         notification.setRead(true);
         notificationRepository.save(notification);
+    }
+
+    public void markAllAsRead(String userId) {
+        List<Notification> notifications = notificationRepository.findByReceiverIdAndIsReadFalse(userId);
+
+        notifications.forEach(n -> n.setRead(true));
+        notificationRepository.saveAll(notifications);
     }
 }

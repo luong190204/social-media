@@ -2,8 +2,11 @@ import React from 'react'
 import { Button } from '../ui/button';
 import { Heart, Search } from 'lucide-react';
 import { Input } from '../ui/input';
+import { useNavigate } from 'react-router-dom';
 
 const TopBar = ({ unreadNotifications = 10, onSearchClick, onNotificationClick }) => {
+
+  const navigate = useNavigate();
 
     const handleSearch = (query) => {
       if (onSearchClick) {
@@ -16,13 +19,11 @@ const TopBar = ({ unreadNotifications = 10, onSearchClick, onNotificationClick }
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center justify-center size-20">
-            <img src="/assets/Swipy.png" alt='Swipy Logo'/>
+            <img src="/assets/Swipy.png" alt="Swipy Logo" />
           </div>
 
           {/* Search bar */}
-          <div
-            className="flex-1 \ max-w-[70%] sm:max-w-xs mx-4"
-          >
+          <div className="flex-1 \ max-w-[70%] sm:max-w-xs mx-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -38,7 +39,7 @@ const TopBar = ({ unreadNotifications = 10, onSearchClick, onNotificationClick }
             variant="ghost"
             size="icon"
             className="relative h-8 w-8 [&_svg]:!w-6 [&_svg]:!h-6"
-            onClick={onNotificationClick}
+            onClick={() => navigate("/notification")}
           >
             <Heart />
             {unreadNotifications > 0 && (

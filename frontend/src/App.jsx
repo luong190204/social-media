@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -17,6 +17,8 @@ import { connectNotificationSocket, disconnectNotificationSocket } from "./lib/n
 import { toast } from "sonner";
 
 function App() {
+  const navigate = useNavigate();
+  
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   const { addNotification } = UseNotificationStore();
@@ -33,7 +35,10 @@ function App() {
       addNotification(newNotification);
 
       toast.success(
-        <div className="flex items-center space-x-3">
+        <div
+          className="flex items-center space-x-3 cursor-pointer"
+          onClick={() => navigate("/notification")}
+        >
           <img
             src={newNotification.senderAvatar || "/assets/avatar.jpg"}
             alt="avatar"

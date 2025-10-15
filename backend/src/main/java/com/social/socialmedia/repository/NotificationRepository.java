@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface NotificationRepository extends MongoRepository<Notification, String> {
     List<NotificationResponse> findByReceiverIdOrderByCreatedAtDesc(String userId);
+
+    List<Notification> findByReceiverIdAndIsReadFalse(String userId);
 }

@@ -30,7 +30,7 @@ export const UseNotificationStore = create((set, get) => ({
             await notificationService.markAsRead(notificationId);
             set((state) => ({
                 notifications: state.notifications.map((n) => 
-                    n.id === notificationId ? { ...n, isRead: true } : n
+                    n.id === notificationId ? { ...n, read: true } : n
                 ),
             }))
         } catch (error) {
@@ -40,9 +40,13 @@ export const UseNotificationStore = create((set, get) => ({
 
     // đánh dấu đọc tất cả thông báo
     markAllAsRead: async () => {
-        const unRead = get().notifications((n) => !n.isRead);
-        for (const n of unRead) {
-            await get().markAsRead(n.id);
+        try {
+            await notificationService.markAllAsRead();
+            set((state) => ({
+                notifications: state.notifications.map((n) => ({ ...n, read: true }))
+            }));
+        } catch (error) {
+            console.log(error);
         }
     }
 }))
