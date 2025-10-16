@@ -9,6 +9,9 @@ const Notification = () => {
     const {
       notifications,
       fetchNotifications,
+      nextPage,
+      page,
+      totalPages,
       markAsRead,
       isLoading,
       markAllAsRead,
@@ -16,10 +19,20 @@ const Notification = () => {
 
     useEffect(() => {
       // Load thông báo
-      fetchNotifications();
-  
+      fetchNotifications(true);
     }, []);
 
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    const isBottom = scrollHeight - scrollTop <= clientHeight + 5;
+
+    if (isBottom && !isLoading && page + 1 < totalPages) {
+      fetchNotifications(false);
+    }
+    console.log("Scroll:", scrollTop, scrollHeight, clientHeight);
+
+  };
   // const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleNotificationClick = (id) => {
@@ -33,6 +46,8 @@ const Notification = () => {
   const handleGoBack = () => {
     navigate(-1); // Quay lại trang trước đó
   };
+
+  
 
   return (
     <div className="fixed inset-0 flex items-end justify-end bg-black/30 z-50">
@@ -54,7 +69,10 @@ const Notification = () => {
         </div>
 
         {/* Notification Content */}
-        <div className="overflow-y-auto h-[calc(100vh-57px)]">
+        <div
+          className="overflow-y-auto h-[calc(100vh-57px)]"
+          onScroll={handleScroll}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
@@ -173,6 +191,10 @@ const Notification = () => {
                 </div>
               )}
             </div>
+          )}
+
+          {isLoading && (
+            <p className="text-center text-sm text-gray-500">Đang tải...</p>
           )}
         </div>
       </div>

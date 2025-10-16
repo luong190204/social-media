@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
-import EditProfile from "./pages/editProfile";
+import EditProfile from "./pages/EditProfile";
 import ProfilePage from "./pages/ProfilePage";
 import Notification from "./pages/Notification";
 import MessagesInterface from "./components/messages/MessagesInterface";
@@ -13,7 +13,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { UseNotificationStore } from "./store/useNotificationStore";
-import { connectNotificationSocket, disconnectNotificationSocket } from "./lib/notificationSocket";
+import { connectNotificationSocket } from "./lib/notificationSocket";
 import { toast } from "sonner";
 
 function App() {
@@ -54,8 +54,6 @@ function App() {
         { duration: 4000 }
       );
     });
-
-    return () => disconnectNotificationSocket();
   }, [authUser]);
 
   // Hiển thị Loader nếu đang trong quá trình kiểm tra

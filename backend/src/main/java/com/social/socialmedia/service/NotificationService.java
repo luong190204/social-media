@@ -8,6 +8,9 @@ import com.social.socialmedia.exception.ErrorCode;
 import com.social.socialmedia.repository.NotificationRepository;
 import com.social.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -65,16 +68,18 @@ public class NotificationService {
         createNotification(receiverId, senderId, senderName, senderAvatar,"COMMENT", postId, message);
     }
 
-    public List<NotificationResponse> getUserNotifications() {
+    public Page<NotificationResponse> getUserNotifications(int page, int size) {
         var username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new AppException(ErrorCode.USER_FOUND));
 
-        var notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(user.getId());
+        Pageable pageable = PageRequest.of(page, size);
+
+        var notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(user.getId(), pageable);
 
         // Convert sang dto kèm thông tin người dùng
-        return notifications.stream().map(notification -> {
+        return notifications.map(notification -> {
             User sender = userRepository.findById(notification.getSenderId()).orElse(null);
 
             return NotificationResponse.builder()
@@ -88,7 +93,7 @@ public class NotificationService {
                     .senderName(sender != null ? sender.getFullName() : "Người dùng")
                     .senderAvatar(sender != null ? sender.getProfilePic() : null)
                     .build();
-        }).toList();
+        });
     }
 
     public void markAsRead(String notificationId) {

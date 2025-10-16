@@ -1,10 +1,9 @@
+import FeedPage from "./FeedPage"
 
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-white">
-      
-    </div>
+    <FeedPage />
   )
 }
 

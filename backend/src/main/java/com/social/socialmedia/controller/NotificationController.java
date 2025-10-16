@@ -6,6 +6,7 @@ import com.social.socialmedia.dto.response.NotificationResponse;
 import com.social.socialmedia.entity.Notification;
 import com.social.socialmedia.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,9 +18,12 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @GetMapping
-    public ApiResponse<List<NotificationResponse>> getUserNotifications() {
-        return ApiResponse.<List<NotificationResponse>>builder()
-                .result(notificationService.getUserNotifications())
+    public ApiResponse<Page<NotificationResponse>> getUserNotifications(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<Page<NotificationResponse>>builder()
+                .result(notificationService.getUserNotifications(page, size))
                 .build();
     }
 

@@ -4,13 +4,31 @@ import { create } from "zustand";
 
 export const UseNotificationStore = create((set, get) => ({
     notifications: [],
+    page: 0,
+    size: 10,
+    totalPages: 1,
     isLoading: false,
 
-    fetchNotifications: async () => {
+    fetchNotifications: async (reset = false) => {
+        const { notifications, page, size, totalPages, isLoading } = get();
+
+        if (isLoading || (page >= totalPages && !reset)) return;
         set({ isLoading: true });
+
         try {
-            const res = notificationService.getUserNotifications();
-            set({ notifications: (await res).data.result, isLoading: false });
+            const res = await notificationService.getUserNotifications(page, size);
+
+            const data = res.data.result;
+
+            set({
+              notifications: reset
+                ? data.content
+                : [...notifications, ...data.content],
+              totalPages: data.totalPages,
+              page: reset ? 1 : page + 1,
+              isLoading: false,
+            });
+            
         } catch (error) {
             console.log("Lỗi khi tải thông báo", error);
             set({ isLoading: false })
