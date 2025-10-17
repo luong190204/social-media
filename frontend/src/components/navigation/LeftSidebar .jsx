@@ -15,7 +15,7 @@ const LeftSidebar  = ({ currentUser, unreadMessages = 8, unreadNotifications = 6
 
   return (
     <div
-      className={`hidden lg:block fixed left-0 top-0 h-full border-r border-gray-200 bg-white z-10 ${
+      className={`hidden lg:block fixed left-0 top-0 h-full border-r mt-20 border-gray-200 bg-white z-10 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >

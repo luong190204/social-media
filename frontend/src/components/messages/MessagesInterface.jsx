@@ -48,7 +48,7 @@ const MessagesInterface = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-[calc(100vh-64px)] mt-16 bg-white">
       {/* Component 1: ChatSidebar */}
       <ChatSidebar
         partner={conversations}
@@ -57,7 +57,7 @@ const MessagesInterface = () => {
       />
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col flex-1 overflow-hidden">
         {selectConversation ? (
           <>
             <ChatHeader
@@ -68,7 +68,9 @@ const MessagesInterface = () => {
               }}
             />
 
-            <ChatContainer messages={messages} />
+            <div className="flex-1 overflow-y-auto">
+              <ChatContainer messages={messages} />
+            </div>
 
             <ChatInput selectConversation={selectConversation} />
           </>

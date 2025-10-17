@@ -107,7 +107,7 @@ const ProfilePage = () => {
             {isUpdatingProfile ? "Uploading..." : ""}
           </p>
         </div>
-
+        <button onClick={() => console.log(authUser)}>Click</button>
         <div className="flex-1">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-semibold">{userProfile?.username}</h2>
@@ -124,7 +124,9 @@ const ProfilePage = () => {
             ) : (
               <div className="flex gap-2">
                 <button
-                  className={`px-4 py-2 rounded-md ${isFollowing ? "bg-gray-300" : "bg-blue-500 text-white"}`}
+                  className={`px-4 py-2 rounded-md ${
+                    isFollowing ? "bg-gray-300" : "bg-blue-500 text-white"
+                  }`}
                   onClick={() => toggleFollowUser(authUser.id)}
                   disabled={isFollowLoading}
                 >

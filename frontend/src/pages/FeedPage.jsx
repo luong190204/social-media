@@ -1,4 +1,6 @@
 
+import Header from '@/components/Header';
+import CreatePost from '@/components/post/CreatePost';
 import PostCard from '@/components/post/PortCard';
 import { useFeedStore } from '@/store/useFeedStore';
 import React, { useEffect } from 'react'
@@ -13,11 +15,14 @@ const FeedPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-
       <div className="max-w-2xl mx-auto">
-        {feedPosts.map((post) => (
-            <PostCard key={post.id} post={post}/>
-        ))}
+        <Header />
+        <div className='mt-16'>
+          <CreatePost />
+          {feedPosts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
       </div>
     </div>
   );

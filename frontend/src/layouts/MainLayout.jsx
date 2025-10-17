@@ -1,15 +1,22 @@
+import Header from '@/components/Header';
 import { LeftSidebar } from '@/components/navigation';
 import BottomNavigation from '@/components/navigation/BottomNavigation';
-import TopBar from '@/components/navigation/TopBar';
 import React from 'react'
 
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 const MainLayout = () => {
+  const location = useLocation();
+  const isMessagePage = location.pathname.startsWith("/messages");
+
   return (
-    <div className="main-layout min-h-screen bg-white flex flex-col">
+    <div
+      className={`flex flex-col h-screen bg-white ${
+        isMessagePage ? "overflow-hidden" : "overflow-y-auto"
+      }`}
+    >
       {/* Top bar luôn hiển thị */}
-      <TopBar />
+      <Header />
 
       <div className="flex flex-1">
         {/* Sidebar cho desktop */}
@@ -18,15 +25,14 @@ const MainLayout = () => {
         </div>
 
         {/* Nội dung chính */}
-        <div className="flex-1 p-4">
+        <div
+          className={`flex-1 ${
+            isMessagePage ? "overflow-hidden" : "overflow-y-auto"
+          }`}
+        >
           <Outlet />
         </div>
       </div>
-
-      {/* Sidebar phụ bên phải (tuỳ chọn, gợi ý follow) */}
-      {/* <aside className="hidden lg:block w-80 border-l">
-        <RightSidebar />
-      </aside> */}
 
       {/* Bottom nav cho mobile */}
       <div className="md:hidden">
@@ -36,5 +42,5 @@ const MainLayout = () => {
   );
 };
 
+export default MainLayout;
 
-export default MainLayout
