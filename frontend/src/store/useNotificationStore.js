@@ -16,17 +16,38 @@ export const UseNotificationStore = create((set, get) => ({
         set({ isLoading: true });
 
         try {
+            const currentPage = reset ? 0 : page;
             const res = await notificationService.getUserNotifications(page, size);
 
             const data = res.data.result;
 
-            set({
-              notifications: reset
-                ? data.content
-                : [...notifications, ...data.content],
-              totalPages: data.totalPages,
-              page: reset ? 1 : page + 1,
-              isLoading: false,
+            set((state) => {
+              let mergedNotifications;
+
+              if (reset) {
+                // lấy ra id của noti mà server trả về 
+                const existingIds = new Set(data.content.map((n) => n.id));
+
+                // Giữ lại những notifi mà không có trong existingIds Server chưa trả chúng (là những noti realtime)
+                const newOnes = notifications.filter(
+                    (n) => !existingIds.has(n.id)
+                )
+                // merged nó vào ds noti server trả về
+                mergedNotifications = [...newOnes, ...data.content];
+              } else {
+                // Load thêm trang kế
+                const existingIds = new Set(notifications.map((n) => n.id ));
+                const newOnes = data.content.filter((n) => !existingIds.has(n.id))
+
+                mergedNotifications = [...state.notifications, ...newOnes];
+              }
+
+              return {
+                notifications: mergedNotifications,
+                totalPages: data.totalPages,
+                page: reset ? 1 : page + 1,
+                isLoading: false,
+              };
             });
             
         } catch (error) {

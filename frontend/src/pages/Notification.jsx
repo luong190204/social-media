@@ -6,32 +6,39 @@ import { useNavigate } from 'react-router-dom';
 const Notification = () => {
   const navigate = useNavigate();
 
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+
     const {
       notifications,
       fetchNotifications,
-      nextPage,
-      page,
-      totalPages,
       markAsRead,
-      isLoading,
       markAllAsRead,
     } = UseNotificationStore();
 
     useEffect(() => {
       // Load thông báo
-      fetchNotifications(true);
+      const loadInitial = async () => {
+        setIsInitialLoading(true);
+        await fetchNotifications(true); // true = reset
+        setIsInitialLoading(false);
+      };
+      loadInitial();
     }, []);
 
-  const handleScroll = (e) => {
+  const handleScroll = async (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
 
-    const isBottom = scrollHeight - scrollTop <= clientHeight + 5;
-
-    if (isBottom && !isLoading && page + 1 < totalPages) {
-      fetchNotifications(false);
+    if (
+      scrollHeight - scrollTop <= clientHeight + 50 &&
+      !isFetchingMore &&
+      !isInitialLoading
+    ) {
+      setIsFetchingMore(true);
+      await fetchNotifications(false); // false = load thêm
+      setIsFetchingMore(false);
     }
-    console.log("Scroll:", scrollTop, scrollHeight, clientHeight);
-
   };
   // const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -73,7 +80,7 @@ const Notification = () => {
           className="overflow-y-auto h-[calc(100vh-57px)]"
           onScroll={handleScroll}
         >
-          {isLoading ? (
+          {isInitialLoading ? (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
             </div>
@@ -190,11 +197,17 @@ const Notification = () => {
                     ))}
                 </div>
               )}
-            </div>
-          )}
 
-          {isLoading && (
-            <p className="text-center text-sm text-gray-500">Đang tải...</p>
+              {/* Loading khi scroll xuống */}
+              {isFetchingMore && (
+                <div className="flex items-center justify-center py-3">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+                  <span className="ml-2 text-sm text-gray-500">
+                    Đang tải thêm...
+                  </span>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
