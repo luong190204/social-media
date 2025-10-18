@@ -86,4 +86,12 @@ import java.util.List;
                     .result("User has been deleted")
                     .build();
         }
+
+        @GetMapping("/search")
+        ApiResponse<List<UserResponse>> searchUsers(@RequestParam("q") String query) {
+            List<UserResponse> users = userService.searchUsers(query);
+            return ApiResponse.<List<UserResponse>>builder()
+                    .result(users)
+                    .build();
+        }
 }

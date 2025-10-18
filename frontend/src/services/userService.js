@@ -19,5 +19,12 @@ export const userService = {
 
     updateProfile: async (data) => {
         return await axiosInstance.put("/users/update-profile", data);
+    },
+
+    searchUsers: async (username) => {
+        return await axiosInstance.get(`/users/search`, {
+            params: {q: username},
+        })
     }
+
 } 

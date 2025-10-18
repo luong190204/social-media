@@ -1,22 +1,22 @@
-import { Badge, Bell, LogOut, MessageCircle, Search, Settings, User } from 'lucide-react';
-import React, { useState } from 'react'
-import { Button } from './ui/button';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useNavigate } from 'react-router-dom';
-import { Input } from './ui/input';
+import { Bell, LogOut, MessageCircle, Settings, User } from "lucide-react";
+import React, { useState } from "react";
+import { Button } from "../ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useNavigate } from "react-router-dom";
+import SearchUser from "./SearchUser";
 
 const Header = () => {
-    
-    const { authUser } = useAuthStore();
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [hasNotifications, setHasNotifications] = useState(true);
-    const [hasMessages, setHasMessages] = useState(true);
+  const { authUser } = useAuthStore();
 
-    const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hasNotifications, setHasNotifications] = useState(true);
+  const [hasMessages, setHasMessages] = useState(true);
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(true);
-    }
+  const navigate = useNavigate();
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(true);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-white via-purple-50/30 to-pink-50/30 backdrop-blur-sm border-b border-gray-200/60 shadow-md z-50">
@@ -29,15 +29,7 @@ const Header = () => {
         </div>
 
         {/* Search */}
-        <div className="flex-1 max-w-md mx-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-            <Input
-              placeholder="Tìm kiếm"
-              className="pl-10 py-2 bg-gray-100 border-0 rounded-lg text-sm focus-visible:ring-1 focus-visible:ring-gray-400"
-            />
-          </div>
-        </div>
+        <SearchUser />
 
         {/* avatar, thông báo, message */}
         <div className="flex items-center space-x-6">
@@ -123,6 +115,6 @@ const Header = () => {
       </div>
     </header>
   );
-}
+};
 
-export default Header
+export default Header;

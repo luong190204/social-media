@@ -1,9 +1,9 @@
-import Header from '@/components/Header';
-import { LeftSidebar } from '@/components/navigation';
-import BottomNavigation from '@/components/navigation/BottomNavigation';
-import React from 'react'
+import Header from "@/components/header/Header";
+import { LeftSidebar } from "@/components/navigation";
+import BottomNavigation from "@/components/navigation/BottomNavigation";
+import React from "react";
 
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from "react-router-dom";
 
 const MainLayout = () => {
   const location = useLocation();
@@ -43,4 +43,3 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
-

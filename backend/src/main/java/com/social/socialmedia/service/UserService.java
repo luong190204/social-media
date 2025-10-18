@@ -21,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -110,5 +112,17 @@ public class UserService {
 
     public void deleteUser(String userId) {
         userRepository.deleteById(userId);
+    }
+
+    public List<UserResponse> searchUsers(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<User> users = userRepository.findByUsernameContainingIgnoreCase(username);
+
+        return users.stream()
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
     }
 }

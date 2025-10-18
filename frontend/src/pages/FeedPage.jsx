@@ -1,23 +1,21 @@
-
-import Header from '@/components/Header';
-import CreatePost from '@/components/post/CreatePost';
-import PostCard from '@/components/post/PortCard';
-import { useFeedStore } from '@/store/useFeedStore';
-import React, { useEffect } from 'react'
+import Header from "@/components/header/Header";
+import CreatePost from "@/components/post/CreatePost";
+import PostCard from "@/components/post/PortCard";
+import { useFeedStore } from "@/store/useFeedStore";
+import React, { useEffect } from "react";
 
 const FeedPage = () => {
+  const { feedPosts, fetchFeedPosts } = useFeedStore();
 
-    const { feedPosts, fetchFeedPosts } = useFeedStore();
-
-    useEffect(() => {
-        fetchFeedPosts();
-    }, [])
+  useEffect(() => {
+    fetchFeedPosts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto">
         <Header />
-        <div className='mt-16'>
+        <div className="mt-20">
           <CreatePost />
           {feedPosts.map((post) => (
             <PostCard key={post.id} post={post} />
@@ -26,6 +24,6 @@ const FeedPage = () => {
       </div>
     </div>
   );
-}
+};
 
-export default FeedPage
+export default FeedPage;

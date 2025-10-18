@@ -73,7 +73,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="max-w-4xl mx-auto px-4 pt-20">
       {/* Header */}
       <div className="flex items-center gap-10 border-b-2">
         {/* avatar upload */}
@@ -107,7 +107,6 @@ const ProfilePage = () => {
             {isUpdatingProfile ? "Uploading..." : ""}
           </p>
         </div>
-        <button onClick={() => console.log(authUser)}>Click</button>
         <div className="flex-1">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-semibold">{userProfile?.username}</h2>
