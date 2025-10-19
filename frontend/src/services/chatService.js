@@ -6,8 +6,10 @@ export const chatService = {
     },
 
     // TODO: implement later
-    createConversation: async () => {
-
+    createConversation: async (participantIds) => {
+        return await axiosInstance.post("/conversations", {
+          participantIds
+        });
     },
 
     fetchMessages: async (conversationId) => {

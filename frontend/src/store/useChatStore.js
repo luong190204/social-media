@@ -8,6 +8,28 @@ export const useChatStore = create((set, get) => ({
   selectConversation: null,
   isMessagesLoading: false,
 
+  createConversations: async (participantIds) => {
+    try {
+      const res = await chatService.createConversation(participantIds);
+
+      const newConversation = res.data.result;
+
+      set((state) => ({
+        conversations: [
+          ...state.conversations.filter((c) => c.id !== newConversation.id),
+          newConversation,
+        ],
+        selectConversation: newConversation,
+      }));
+
+      return newConversation;
+    } catch (error) {
+      toast.error("Lỗi khi tạo cuộc trò chuyện");
+    }
+  },
+
+  setSelectConversation: (conv) => set({ selectConversation: conv }),
+
   fetchConversations: async () => {
     try {
       const res = await chatService.fetchConversations();

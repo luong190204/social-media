@@ -88,6 +88,7 @@ function App() {
         <Route path="/profile/:userId" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/messages" element={<MessagesInterface />} />
+        <Route path="/messages/:conversationId" element={<MessagesInterface />} />
         <Route path="/notification" element={<Notification />}/>
       </Route>
       {/* Người dùng đã đăng nhập sẽ không cần truy cập trang Auth */}

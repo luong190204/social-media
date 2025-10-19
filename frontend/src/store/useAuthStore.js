@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { toast } from 'sonner';
 import { authService } from '@/services/authService';
 import { disconnectNotificationSocket } from '@/lib/notificationSocket';
+import { axiosInstance } from '@/lib/axios';
 export const useAuthStore = create((set) => ({
   authUser: null,
   isSigningUp: false,
@@ -71,6 +72,8 @@ export const useAuthStore = create((set) => ({
     await authService.logout();
     disconnectNotificationSocket();
     localStorage.removeItem("token");
-    toast.success("Đăng xuất thành công!");
+    delete axiosInstance.defaults.headers.common["Authorization"];
+
+    set({ authUser: null });
   },
 }));

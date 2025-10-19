@@ -6,8 +6,12 @@ import ChatInput from './ChatInput';
 import NoChatSelected from './NoChatSelected';
 import { useChatStore } from '@/store/useChatStore';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const MessagesInterface = () => {
+
+  const navigate = useNavigate();
+  const { conversationId } = useParams();
 
   const {
     conversations,
@@ -16,31 +20,45 @@ const MessagesInterface = () => {
     fetchConversations,
     fetchMessages,
     markConversationAsRead,
+    setSelectConversation,
   } = useChatStore(); 
     
+  // Lấy danh sách cuộc trò chuyện khi vào trang 
     useEffect(() => {
       fetchConversations();
     }, [fetchConversations]);
+  
+  // Nếu có conversationId trên URL → chọn & fetch tin nhắn
+  useEffect(() => {
+    if ( !conversationId || conversations.length === 0 ) return;
+    
+    const selected = conversations.find((c) => c.id === conversationId);
+    if (selected) {
+      setSelectConversation(selected);
+      fetchMessages(selected);
+
+      // Ngắt kết nối WebSocket cũ (nếu có)
+      disconnectSocket();
+
+      // Kết nối WebSocket mới
+      connectSocket(selected.id, (newMessage) => {
+        useChatStore.setState((state) => ({
+          messages: [...state.messages, newMessage],
+        }));
+      });
+    }
+  }, [conversationId, conversations])
 
   const handleUserSelect = async (conv) => {
     // Update đã đọc nếu có unReadCount
     if (conv.unReadCount > 0) {
       markConversationAsRead(conv.id);
     }
-
-    await fetchMessages(conv);
-
-    // Ngắt kết nối WebSocket cũ (nếu có)
-    disconnectSocket();
-
-    // Kết nối WebSocket mới
-    connectSocket(conv.id, (newMessage) => {
-      useChatStore.setState((state) => ({
-        messages: [...state.messages, newMessage],
-      }));
-    });
+    
+    navigate(`/messages/${conv.id}`);
   };
 
+  // Ngắt kết nối socket khi rời trang
   useEffect(() => {
     return () => {
       disconnectSocket();

@@ -25,6 +25,9 @@ public class FollowService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     public void follow(String targetId) {
         // Lấy user hiện tại từ jwt
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -50,6 +53,10 @@ public class FollowService {
                     follower.getFullName(),
                     follower.getProfilePic()
             );
+
+            // Tạo conversation giữa hai người
+            List<String> participants = List.of(follower.getId(), target.getId());
+            conversationService.createConversation(participants);
         };
     }
 

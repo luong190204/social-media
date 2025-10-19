@@ -29,7 +29,7 @@ export default function ChatHeader({ user }) {
         <Avatar src={user?.avatar} name={user?.name} size="sm" />
         <div className="ml-3">
           <h3 className="font-medium">{user?.name}</h3>
-          <p className="text-xs text-gray-500">{user?.name.toLowerCase()}</p>
+          <p className="text-xs text-gray-500">{user?.name?.toLowerCase()}</p>
         </div>
       </div>
       <div className="flex items-center space-x-4">

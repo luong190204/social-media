@@ -19,5 +19,8 @@ export const connectSocket = (conversationId, onMessageReceived) => {
 };
 
 export const disconnectSocket = () => {
-  if (stompClient) stompClient.disconnect();
+  if (stompClient && stompClient.connected) {
+    stompClient.disconnect();
+    stompClient = null;
+  }
 };

@@ -7,6 +7,7 @@ import PostCard from "../components/post/PortCard";
 import CreatePost from "@/components/post/CreatePost";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useChatStore } from "@/store/useChatStore";
 
 const ProfilePage = () => {
 
@@ -28,6 +29,8 @@ const ProfilePage = () => {
   const { posts, isPostsLoading, fetchPosts } = usePostStore();
 
   const { authUser } = useAuthStore();
+
+  const { createConversations } = useChatStore();
 
   const isFollowing = userProfile?.followers?.includes(authUser.id)
 
@@ -54,6 +57,18 @@ const ProfilePage = () => {
 
     await updateAvatar(formData);
   };
+
+  const handleMessageClick = async () => {
+    try {
+      const conversation = await createConversations([
+        authUser.id,
+        userProfile.id,
+      ]);
+      navigate(`/messages/${conversation.id}`);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   if (isLoadingProfile) {
     return (
@@ -133,7 +148,7 @@ const ProfilePage = () => {
                 </button>
                 <button
                   className="px-4 py-1 bg-pink-600 text-white rounded-md"
-                  // onClick={() => handleFollow(userProfile.id)}
+                  onClick={handleMessageClick}
                 >
                   Nhắn tin
                 </button>
