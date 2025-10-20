@@ -36,16 +36,6 @@ const MessagesInterface = () => {
     if (selected) {
       setSelectConversation(selected);
       fetchMessages(selected);
-
-      // Ngắt kết nối WebSocket cũ (nếu có)
-      disconnectSocket();
-
-      // Kết nối WebSocket mới
-      connectSocket(selected.id, (newMessage) => {
-        useChatStore.setState((state) => ({
-          messages: [...state.messages, newMessage],
-        }));
-      });
     }
   }, [conversationId, conversations])
 
@@ -57,13 +47,6 @@ const MessagesInterface = () => {
     
     navigate(`/messages/${conv.id}`);
   };
-
-  // Ngắt kết nối socket khi rời trang
-  useEffect(() => {
-    return () => {
-      disconnectSocket();
-    }
-  }, []);
 
   return (
     <div className="flex h-[calc(100vh-64px)] mt-16 bg-white">

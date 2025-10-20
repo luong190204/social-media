@@ -3,12 +3,14 @@ package com.social.socialmedia.service;
 import com.social.socialmedia.dto.request.MessageRequest;
 import com.social.socialmedia.entity.Conversation;
 import com.social.socialmedia.entity.Message;
+import com.social.socialmedia.entity.User;
 import com.social.socialmedia.enums.StatusMessage;
 import com.social.socialmedia.enums.TypeContent;
 import com.social.socialmedia.exception.AppException;
 import com.social.socialmedia.exception.ErrorCode;
 import com.social.socialmedia.repository.ConversationRepository;
 import com.social.socialmedia.repository.MessageRepository;
+import com.social.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,9 @@ public class MessageService {
     private ConversationRepository conversationRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private CloudinaryService cloudinaryService;
 
     @Autowired
@@ -41,9 +46,14 @@ public class MessageService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
+        User user = userRepository.findById(request.getSenderId()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_FOUND));
+
         Message message = Message.builder()
                 .conversationId(request.getConversationId())
                 .senderId(request.getSenderId())
+                .senderName(user.getFullName())
+                .senderAvatar(user.getProfilePic())
                 .type(TypeContent.TEXT)
                 .content(request.getContent())
                 .timestamp(LocalDateTime.now())
@@ -55,7 +65,10 @@ public class MessageService {
         updateConversation(conversation, message, request.getSenderId());
 
         // Realtime Socket
-        simpMessagingTemplate.convertAndSend("/topic/conversation/" + request.getConversationId(), message);
+        // Gửi realtime cho tất cả participant trong cuộc trò chuyện
+        for (String participantId : conversation.getParticipants()) {
+            simpMessagingTemplate.convertAndSend("/topic/user/" + participantId, message);
+        }
         return message;
     }
 

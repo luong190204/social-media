@@ -21,6 +21,8 @@ public class Message {
     private String id;
     private String conversationId;
     private String senderId;
+    private String senderName;
+    private String senderAvatar;
     private TypeContent type;
     private String content;
     private LocalDateTime timestamp;

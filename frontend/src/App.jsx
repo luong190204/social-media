@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -15,10 +15,14 @@ import { Loader } from "lucide-react";
 import { UseNotificationStore } from "./store/useNotificationStore";
 import { connectNotificationSocket } from "./lib/notificationSocket";
 import { toast } from "sonner";
+import { connectSocket, disconnectSocket } from "./lib/socket";
+import { useChatStore } from "./store/useChatStore";
+import MessageToast from "./components/toast/MessageToast";
 
 function App() {
   const navigate = useNavigate();
-  
+  const location = useLocation();
+
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   const { addNotification } = UseNotificationStore();
@@ -26,6 +30,49 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Realtime message
+  useEffect(() => {
+    if (!authUser) return;
+
+    connectSocket(authUser.id, (newMessage) => {
+      const { selectConversation, conversations, messages, setSelectConversation, fetchConversations } = useChatStore.getState();
+
+      // Kiểm tra xem user hiện tại có đang ở đúng conversation đó không
+      const isInCurrentChat = selectConversation && selectConversation.id === newMessage.conversationId;
+
+      const isInMessagePage = location.pathname.startsWith("/messages");
+
+      if (isInCurrentChat && isInMessagePage) {
+        // Nếu đang mở đúng cuộc trò chuyện -> realtime tin nhắn
+        useChatStore.setState({
+          messages: [...messages, newMessage],
+        });
+      } else {
+        toast.custom(
+          (t) => (
+            <MessageToast
+              message={newMessage}
+              onClick={() => {
+                toast.dismiss(t.id); // tắt toast
+                setSelectConversation(
+                  conversations.find((c) => c.id === newMessage.conversationId)
+                );
+                window.location.href = `/messages/${newMessage.conversationId}`;
+              }}
+            />
+          ),
+          { duration: 4000 }
+        );
+
+        fetchConversations();
+      }
+    })
+
+    return () => {
+      disconnectSocket();
+    }
+  }, [authUser, location])
 
   // Realtime notification 
   useEffect(() => {

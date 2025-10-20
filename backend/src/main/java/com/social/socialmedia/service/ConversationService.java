@@ -93,7 +93,19 @@ public class ConversationService {
                     .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
                     .unReadCount(conv.getUnReadCount().getOrDefault(currentUserId, 0))
                     .build();
-        }).toList();
+        })
+                // Sort sắp xếp conversation nào có tin nhắn mới nhất thì lên trước 
+                .sorted((c1, c2) -> {
+                    // Nếu cả 2 đều có lastMessageTime
+                    if (c1.getLastMessageTime() != null && c2.getLastMessageTime() != null) {
+                        return c2.getLastMessageTime().compareTo(c1.getLastMessageTime()); // mới nhất
+                    }
+
+                    // nếu 1 trong 2 null (chưa có tin nhắn nào)
+                    if (c1.getLastMessageTime() == null) return 1;
+                    if (c2.getLastMessageTime() == null) return -1;
+                    return 0;
+                }).toList();
     }
 
     // Hàm cập nhật unReadCount

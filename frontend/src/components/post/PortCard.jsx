@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { Heart, MessageCircle, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, MessageCircle, MoreHorizontal } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import PostMoreMenu from "./PostMoreMenu";
@@ -81,8 +81,8 @@ const PortCard = ({ post }) => {
             variant="ghost"
             className="h-auto "
           >
-          <MoreHorizontal />
-        </Button>
+            <MoreHorizontal />
+          </Button>
         ) : (
           ""
         )}
@@ -99,65 +99,71 @@ const PortCard = ({ post }) => {
 
       {/* Media */}
       {post.mediaUrls && post.mediaUrls.length > 0 && (
-        <div className="relative w-full rounded-xl overflow-hidden">
-          <div className="w-ful max-h-[600px] flex justify-center items-center bg-black rounded-xl overflow-hidden">
+        <div className="relative w-full -mx-4 sm:mx-0 sm:rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-neutral-900 dark:to-neutral-950">
+          <div className="relative w-full">
             {post.mediaUrls[currentImageIndex].match(/\.(mp4|webm|ogg)$/i) ? (
               <video
                 src={post.mediaUrls[currentImageIndex]}
                 controls
-                className="max-h-[600px] w-auto rounded-xl"
+                className="w-full h-auto max-h-[600px] object-contain"
+                style={{ aspectRatio: "auto" }}
               />
             ) : (
               <img
                 src={post.mediaUrls[currentImageIndex]}
                 alt={`post-media-${currentImageIndex}`}
-                className="max-h-[600px] w-auto rounded-xl"
+                className="w-full h-auto max-h-[600px] object-contain"
+                style={{ aspectRatio: "auto" }}
               />
             )}
           </div>
 
-          {currentImageIndex > 0 && (
-            <button
-              onClick={goToPrevious}
-              className="absolute top-1/2 left-2 transform -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-          )}
+          {/* Navigation Buttons */}
+          {post.mediaUrls.length > 1 && (
+            <>
+              {currentImageIndex > 0 && (
+                <button
+                  onClick={goToPrevious}
+                  className="absolute top-1/2 left-3 -translate-y-1/2 group"
+                  aria-label="Previous image"
+                >
+                  <div className="p-2 rounded-full bg-white/90 dark:bg-neutral-800/90 shadow-lg backdrop-blur-sm transition-all duration-200 group-hover:bg-white dark:group-hover:bg-neutral-700 group-hover:scale-110">
+                    <ChevronLeft />
+                  </div>
+                </button>
+              )}
 
-          {currentImageIndex < post.mediaUrls.length - 1 && (
-            <button
-              onClick={goToNext}
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
+              {currentImageIndex < post.mediaUrls.length - 1 && (
+                <button
+                  onClick={goToNext}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 group"
+                  aria-label="Next image"
+                >
+                  <div className="p-2 rounded-full bg-white/90 dark:bg-neutral-800/90 shadow-lg backdrop-blur-sm transition-all duration-200 group-hover:bg-white dark:group-hover:bg-neutral-700 group-hover:scale-110">
+                    <ChevronRight />
+                  </div>
+                </button>
+              )}
+
+              {/* Image Indicators */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {post.mediaUrls.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      // Thêm function để jump đến ảnh cụ thể nếu cần
+                      setCurrentImageIndex(index);
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      index === currentImageIndex
+                        ? "w-6 bg-white"
+                        : "w-1.5 bg-white/50 hover:bg-white/75"
+                    }`}
+                    aria-label={`Go to image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
