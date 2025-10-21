@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { sidebarItems } from './menuItems';
 import { Button } from '../ui/button';
 import { Menu, X } from 'lucide-react';
+import { useChatStore } from '@/store/useChatStore';
+import { UseNotificationStore } from '@/store/useNotificationStore';
 
-const LeftSidebar  = ({ currentUser, unreadMessages = 8, unreadNotifications = 6, onCreateClick }) => {
+const LeftSidebar  = ({ currentUser, onCreateClick }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -12,7 +14,14 @@ const LeftSidebar  = ({ currentUser, unreadMessages = 8, unreadNotifications = 6
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
+  
+  const { conversations } = useChatStore();
+  // kiểm tra xem có tin nhắn chưa đọc không
+  const hasUnreadMessages = conversations?.some(conv => conv.unReadCount > 0);
 
+  const { notifications } = UseNotificationStore();
+  // Trả về true nếu có ít nhất 1 thông báo chưa đọc
+  const hasUnreadNotifications = notifications?.some((n) => !n.read)
   return (
     <div
       className={`hidden lg:block fixed left-0 top-0 h-full border-r mt-20 border-gray-200 bg-white z-10 ${
@@ -50,8 +59,8 @@ const LeftSidebar  = ({ currentUser, unreadMessages = 8, unreadNotifications = 6
             };
 
             let badgeCount = 0;
-            if (item.id === "messages") badgeCount = unreadMessages;
-            if (item.id === "notifications") badgeCount = unreadNotifications;
+            if (item.id === "messages" && hasUnreadMessages) badgeCount = 1;
+            if (item.id === "notifications" && hasUnreadNotifications) badgeCount = 1;
 
             return (
               <Button

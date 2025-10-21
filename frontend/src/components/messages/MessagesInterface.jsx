@@ -5,7 +5,6 @@ import ChatContainer from './ChatContainer';
 import ChatInput from './ChatInput';
 import NoChatSelected from './NoChatSelected';
 import { useChatStore } from '@/store/useChatStore';
-import { connectSocket, disconnectSocket } from '@/lib/socket';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const MessagesInterface = () => {

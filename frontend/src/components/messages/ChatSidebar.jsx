@@ -29,7 +29,7 @@ export const ChatSidebar = ({ partner, selectedUser, onUserSelect }) => {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Tin nhắn</h2>
           <div className="text-sm text-gray-500">Tin nhắn đang chờ</div>
-        </div>   
+        </div>
       </div>
 
       {/* Conversations List */}
@@ -64,7 +64,13 @@ export const ChatSidebar = ({ partner, selectedUser, onUserSelect }) => {
                 )}
               </div>
 
-              <p className="text-sm text-gray-500 truncate">
+              <p
+                className={`text-sm truncate ${
+                  conv.unReadCount > 0
+                    ? "text-gray-900 font-semibold"
+                    : "text-gray-500 font-normal"
+                } `}
+              >
                 {conv.lastMessageContent
                   ? conv.lastMessageContent.startsWith("http")
                     ? "Hình ảnh"
@@ -73,9 +79,9 @@ export const ChatSidebar = ({ partner, selectedUser, onUserSelect }) => {
               </p>
             </div>
 
-            {conv.unreadCount > 0 && (
+            {conv.unReadCount > 0 && (
               <span className="ml-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex-shrink-0">
-                {conv.unreadCount}
+                {conv.unReadCount}
               </span>
             )}
           </div>

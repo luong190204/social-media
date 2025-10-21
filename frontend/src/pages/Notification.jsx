@@ -58,6 +58,7 @@ const Notification = () => {
 
   return (
     <div className="fixed inset-0 flex items-end justify-end bg-black/30 z-50">
+      <button onClick={() => console.log(notifications)}>Click</button>
       <div
         className="bg-white w-full h-full sm:h-[100vh] sm:max-w-md sm:rounded-tl-2xl sm:shadow-lg
         overflow-hidden flex flex-col"

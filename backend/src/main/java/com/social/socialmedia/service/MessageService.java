@@ -97,7 +97,10 @@ public class MessageService {
         updateConversation(conversation, message, senderId);
 
         // Realtime Socket
-        simpMessagingTemplate.convertAndSend("/topic/conversation/" + conversationId, message);
+        // Gửi realtime cho tất cả participant trong cuộc trò chuyện
+        for (String participantId : conversation.getParticipants()) {
+            simpMessagingTemplate.convertAndSend("/topic/user/" + participantId, message);
+        }
         return message;
     }
 
