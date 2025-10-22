@@ -102,14 +102,14 @@ export const useUserStore = create ((set, get) => ({
 
     },
 
-    searchUsers: async (username) => {
-        if (!username.trim()) {
+    searchUsers: async (fullname) => {
+        if (!fullname.trim()) {
             set({ searchResult: [] });
             return;
         }
         set({ isSearching: true })
         try {
-          const res = await userService.searchUsers(username);
+          const res = await userService.searchUsers(fullname);
           set({ searchResults: res.data.result || [] });
         } catch (error) {
           console.error("Lỗi khi tìm kiếm người dùng:", error);

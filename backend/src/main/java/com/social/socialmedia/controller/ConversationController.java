@@ -2,8 +2,10 @@ package com.social.socialmedia.controller;
 
 import com.social.socialmedia.dto.request.ApiResponse;
 import com.social.socialmedia.dto.response.ConversationResponse;
+import com.social.socialmedia.dto.response.UserResponse;
 import com.social.socialmedia.entity.Conversation;
 import com.social.socialmedia.service.ConversationService;
+import com.social.socialmedia.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,9 @@ public class ConversationController {
 
     @Autowired
     private ConversationService conversationService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ApiResponse<Conversation> createConversation(@RequestBody Map<String, List<String>> request) {
@@ -46,6 +51,15 @@ public class ConversationController {
 
         return ApiResponse.<Void>builder()
                 .message("Marked as read")
+                .build();
+    }
+
+    // Search người dùng trong message
+    @GetMapping("/search")
+    public ApiResponse<List<UserResponse>> searchUsers(@RequestParam("q") String query) {
+        List<UserResponse> partners = userService.searchUsersMessage(query);
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(partners)
                 .build();
     }
 

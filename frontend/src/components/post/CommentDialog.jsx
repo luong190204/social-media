@@ -37,43 +37,53 @@ const CommentDialog = ({ post, open, onClose }) => {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl p-0 flex h-[85vh]">
         {/* left */}
-        <div className="w-1/2 bg-black flex items-center justify-center">
+        <div className="w-1/2 bg-white flex items-center justify-center">
           {mediaUrls.length > 0 && (
             <>
-              <div className="relative w-full h-full flex items-center justify-center">
-                {mediaUrls[currentMediaIndex]?.endsWith(".mp4") ? (
-                  <video
-                    src={mediaUrls[currentMediaIndex]}
-                    controls
-                    className="max-w-full max-h-full object-contain"
-                    key={currentMediaIndex}
-                  />
-                ) : (
-                  <img
-                    src={mediaUrls[currentMediaIndex]}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                )}
+              <div className="relative w-full -mx-4 sm:mx-0 sm:rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-neutral-900 dark:to-neutral-950">
+                <div className="relative w-full">
+                  {post.mediaUrls[currentMediaIndex].match(
+                    /\.(mp4|webm|ogg)$/i
+                  ) ? (
+                    <video
+                      src={post.mediaUrls[currentMediaIndex]}
+                      controls
+                      className="w-full h-auto max-h-[600px] object-contain"
+                      style={{ aspectRatio: "auto" }}
+                    />
+                  ) : (
+                    <img
+                      src={post.mediaUrls[currentMediaIndex]}
+                      alt={`post-media-${currentMediaIndex}`}
+                      className="w-full h-auto max-h-[600px] object-contain"
+                      style={{ aspectRatio: "auto" }}
+                    />
+                  )}
+                </div>
 
                 {mediaUrls.length > 1 && (
                   <>
                     {currentMediaIndex > 0 && (
                       <button
-                        type="button"
-                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full p-2 transition-colors"
                         onClick={prevMedia}
+                        className="absolute top-1/2 left-3 -translate-y-1/2 group"
+                        aria-label="Previous image"
                       >
-                        <ChevronLeft className="w-5 h-5" />
+                        <div className="p-2 rounded-full bg-white/90 dark:bg-neutral-800/90 shadow-lg backdrop-blur-sm transition-all duration-200 group-hover:bg-white dark:group-hover:bg-neutral-700 group-hover:scale-110">
+                          <ChevronLeft />
+                        </div>
                       </button>
                     )}
 
-                    {currentMediaIndex < mediaUrls.length - 1 && (
+                    {currentMediaIndex < post.mediaUrls.length - 1 && (
                       <button
-                        type="button"
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full p-2 transition-colors"
                         onClick={nextMedia}
+                        className="absolute top-1/2 right-3 -translate-y-1/2 group"
+                        aria-label="Next image"
                       >
-                        <ChevronRight className="w-5 h-5" />
+                        <div className="p-2 rounded-full bg-white/90 dark:bg-neutral-800/90 shadow-lg backdrop-blur-sm transition-all duration-200 group-hover:bg-white dark:group-hover:bg-neutral-700 group-hover:scale-110">
+                          <ChevronRight />
+                        </div>
                       </button>
                     )}
                   </>
@@ -118,7 +128,7 @@ const CommentDialog = ({ post, open, onClose }) => {
         </div>
 
         {/* right */}
-        <div className="w-1/2 flex flex-col">
+        <div className="w-1/2 flex flex-col border-l border-gray-300">
           <div className="flex items-center gap-2 border-b pt-3 px-3">
             <Avatar className="h-8 w-8">
               <AvatarImage src={post?.author?.profilePic} />

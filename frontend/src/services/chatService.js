@@ -39,5 +39,11 @@ export const chatService = {
 
     markConversationAsRead: async (conversationId) => {
         return await axiosInstance.put(`/conversations/${conversationId}/read`);
+    },
+
+    searchUsers: async (fullname) => {
+        return await axiosInstance.get(`/conversations/search`, {
+            params: {q: fullname},
+        });
     }
 }

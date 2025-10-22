@@ -8,6 +8,8 @@ export const useChatStore = create((set, get) => ({
   selectConversation: null,
   isMessagesLoading: false,
 
+  searchResult: [],
+  isSearching: false,
   createConversations: async (participantIds) => {
     try {
       const res = await chatService.createConversation(participantIds);
@@ -102,6 +104,24 @@ export const useChatStore = create((set, get) => ({
     } catch (error) {
       console.error("Mark as read error:", error);
       get().fetchConversations(); // Đồng bộ lại nếu có lỗi
+    }
+  },
+
+  searchUsers: async (username) => {
+    if (!username.trim()) {
+      set({ searchResult: []})
+      return;
+    }
+
+    set({ isSearching: true })
+    try {
+      const res = chatService.searchUsers(username);
+      set({ searchResult: res.data.result || [] });
+    } catch (error) {
+      console.log("Lỗi khi tìm kiếm người dùng");
+      set({ searchResult: [] });
+    } finally {
+      set({ isSearching: false });
     }
   },
 }));
