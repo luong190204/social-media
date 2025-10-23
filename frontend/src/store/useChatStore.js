@@ -115,7 +115,7 @@ export const useChatStore = create((set, get) => ({
 
     set({ isSearching: true })
     try {
-      const res = chatService.searchUsers(username);
+      const res = await chatService.searchUsers(username);
       set({ searchResult: res.data.result || [] });
     } catch (error) {
       console.log("Lỗi khi tìm kiếm người dùng");

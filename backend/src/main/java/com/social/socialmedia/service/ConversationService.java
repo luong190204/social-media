@@ -2,6 +2,7 @@ package com.social.socialmedia.service;
 
 import com.social.socialmedia.configuration.SecurityUtils;
 import com.social.socialmedia.dto.response.ConversationResponse;
+import com.social.socialmedia.dto.response.SearchUserResponse;
 import com.social.socialmedia.entity.Conversation;
 import com.social.socialmedia.entity.Message;
 import com.social.socialmedia.entity.User;
@@ -125,4 +126,37 @@ public class ConversationService {
         conversationRepository.save(conversation);
     }
 
+    // Hàm search user trong messages
+    public List<SearchUserResponse> searchUsersMessage(String keyword) {
+        String currentUserId = SecurityUtils.getCurrentUserId();
+
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(
+                () -> new AppException(ErrorCode.USER_FOUND));
+
+        List<String> followingIds = currentUser.getFollowing();
+        if (followingIds == null || followingIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Search những user nào mà mình follow và có tên khớp với keyword
+        List<User> matchUsers = userRepository.findByIdInAndFullNameContainingIgnoreCase(followingIds, keyword);
+
+        return matchUsers.stream()
+                .map(user -> {
+                    // tìm conversation giữa currentUser và user
+                    Optional<Conversation> conversationOpt = conversationRepository
+                            .findByParticipants(Arrays.asList(currentUserId, user.getId()));
+
+                    String conversationId = conversationOpt.map(Conversation::getId).orElse(null);
+
+                    return SearchUserResponse.builder()
+                            .id(user.getId())
+                            .username(user.getUsername())
+                            .fullName(user.getFullName())
+                            .profilePic(user.getProfilePic())
+                            .conversationId(conversationId)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 }

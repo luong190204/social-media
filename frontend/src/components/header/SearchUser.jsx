@@ -3,6 +3,7 @@ import { Search, User, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
+import { useOnlineStore } from "@/store/useOnlineStore";
 
 const SearchUser = () => {
   const { searchResults, searchUsers, isSearching } = useUserStore();
@@ -10,6 +11,8 @@ const SearchUser = () => {
   const [isFocused, setIsFocused] = useState(false);
 
   const navigate = useNavigate();
+
+  const { onlineUsers } = useOnlineStore();
 
   useEffect(() => {
     if (!searchTerm.trim()) return;
@@ -100,38 +103,44 @@ const SearchUser = () => {
                     <p className="text-xs font-semibold text-gray-500 uppercase mb-2 px-3">
                       Kết quả ({searchResults.length})
                     </p>
-                    {searchResults.map((user) => (
-                      <div
-                        key={user.id}
-                        onClick={() => handleUserClick(user.id)}
-                        className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-all duration-150 group"
-                      >
-                        <div className="relative">
-                          <img
-                            src={user.profilePic || "/assets/avatar.jpg"}
-                            alt={user.username}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
-                            onError={(e) => {
-                              e.target.src = `https://ui-avatars.com/api/?name=${user.username}&background=3b82f6&color=fff`;
-                            }}
-                          />
+                    {searchResults.map((user) => {
+                      const isOnline = onlineUsers.includes(user.id);
+                      return (
+                        <div
+                          key={user.id}
+                          onClick={() => handleUserClick(user.id)}
+                          className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-all duration-150 group"
+                        >
+                          <button onClick={() => console.log(user)}>
+                            Click
+                          </button>
+                          <div className="relative">
+                            <img
+                              src={user.profilePic || "/assets/avatar.jpg"}
+                              alt={user.username}
+                              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                              onError={(e) => {
+                                e.target.src = `https://ui-avatars.com/api/?name=${user.username}&background=3b82f6&color=fff`;
+                              }}
+                            />
 
-                          {/* TODO: Online indicator - Nếu có trường isOnline */}
-                          {/* {user.isOnline && (
+                            {/* TODO: Online indicator - Nếu có trường isOnline */}
+                            {isOnline && (
                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                              )} */}
+                              )} 
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                              {user.fullName || user.username}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              @{user.username}
+                            </p>
+                          </div>
+                          <User className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors flex-shrink-0" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors truncate">
-                            {user.fullName || user.username}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            @{user.username}
-                          </p>
-                        </div>
-                        <User className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors flex-shrink-0" />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="p-8 text-center">

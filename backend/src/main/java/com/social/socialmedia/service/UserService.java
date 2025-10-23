@@ -3,6 +3,7 @@ package com.social.socialmedia.service;
 import com.social.socialmedia.configuration.SecurityUtils;
 import com.social.socialmedia.dto.request.UserCreationRequest;
 import com.social.socialmedia.dto.request.UserUpdateRequest;
+import com.social.socialmedia.dto.response.SearchUserResponse;
 import com.social.socialmedia.dto.response.UserResponse;
 import com.social.socialmedia.entity.User;
 import com.social.socialmedia.enums.Role;
@@ -127,27 +128,5 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // Hàm search user trong messages
-    public List<UserResponse> searchUsersMessage(String keyword) {
-        String currentUserId = SecurityUtils.getCurrentUserId();
 
-        User currentUser = userRepository.findById(currentUserId).orElseThrow(
-                () -> new AppException(ErrorCode.USER_FOUND));
-
-        List<String> followingIds = currentUser.getFollowing();
-        if (followingIds == null || followingIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<User> matchUsers = userRepository.findByIdInAndFullNameContainingIgnoreCase(followingIds, keyword);
-
-        return matchUsers.stream()
-                .map(user -> UserResponse.builder()
-                        .id(user.getId())
-                        .username(user.getUsername())
-                        .fullName(user.getFullName())
-                        .profilePic(user.getProfilePic())
-                        .build())
-                .collect(Collectors.toList());
-    }
 }

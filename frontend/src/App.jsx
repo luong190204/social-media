@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { connectSocket, disconnectSocket } from "./lib/socket";
 import { useChatStore } from "./store/useChatStore";
 import MessageToast from "./components/toast/MessageToast";
+import { useOnlineUsers } from "./lib/useOnlineUsers";
 
 function App() {
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useOnlineUsers(authUser);
 
   // Realtime message
   useEffect(() => {
