@@ -1,4 +1,5 @@
 import { Info, MessageCircle, Phone, Video } from "lucide-react";
+import CallButton from "../call/CallButton";
 
 export default function ChatHeader({ user }) {
   const Avatar = ({ src, name, size = "md" }) => {
@@ -34,7 +35,7 @@ export default function ChatHeader({ user }) {
       </div>
       <div className="flex items-center space-x-4">
         <Phone className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-500" />
-        <Video className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-500" />
+        <CallButton />
         <Info className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-500" />
       </div>
     </div>

@@ -1,3 +1,4 @@
+// để truyền offer/answer/ICE giữa 2 user.
 package com.social.socialmedia.controller;
 
 import com.social.socialmedia.dto.request.SignalingMessage;
@@ -16,7 +17,7 @@ public class SignalingController {
     private final SimpMessagingTemplate messagingTemplate;
     private final CallService callService;
 
-    @MessageMapping("/call")
+    @MessageMapping("/call.send")
     public void handleSignaling(@Payload SignalingMessage msg, Principal principal) {
         msg.setFrom(principal.getName());
 
