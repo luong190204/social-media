@@ -111,9 +111,6 @@ const SearchUser = () => {
                           onClick={() => handleUserClick(user.id)}
                           className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-all duration-150 group"
                         >
-                          <button onClick={() => console.log(user)}>
-                            Click
-                          </button>
                           <div className="relative">
                             <img
                               src={user.profilePic || "/assets/avatar.jpg"}

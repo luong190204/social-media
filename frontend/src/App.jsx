@@ -32,6 +32,7 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
+  // Online users 
   useOnlineUsers(authUser);
 
   // Realtime message

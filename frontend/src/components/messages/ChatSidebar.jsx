@@ -52,8 +52,8 @@ export const ChatSidebar = ({ partner, selectedUser, onUserSelect }) => {
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <span
-                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                    isOnline ? "bg-green-500" : "bg-gray-400"
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full  ${
+                    isOnline ? "bg-green-500 border-2 border-white" : ""
                   }`}
                 ></span>
               </div>

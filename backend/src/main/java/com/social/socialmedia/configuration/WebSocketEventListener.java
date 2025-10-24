@@ -3,7 +3,6 @@ package com.social.socialmedia.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -29,5 +28,17 @@ public class WebSocketEventListener {
 
         // Gửi riêng cho user vừa connect danh sách hiện tại
         messagingTemplate.convertAndSendToUser(userId, "/queue/onlineUsers", onlineUsers);
+    }
+
+    // Khi user ngắt kết nối
+    @EventListener
+    public void handleSessionDisconnectEvent(SessionDisconnectEvent event) {
+        String userId = event.getUser() != null ? event.getUser().getName() : null;
+        if (userId != null) {
+            onlineUsers.remove(userId);
+
+            // Broadcast danh sách mới sau khi user rời đi
+            messagingTemplate.convertAndSend("/topic/onlineUsers", onlineUsers);
+        }
     }
 }
