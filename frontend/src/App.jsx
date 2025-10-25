@@ -19,6 +19,9 @@ import { connectSocket, disconnectSocket } from "./lib/socket";
 import { useChatStore } from "./store/useChatStore";
 import MessageToast from "./components/toast/MessageToast";
 import { useOnlineUsers } from "./lib/useOnlineUsers";
+import { CallProvider } from "./context/CallContext";
+import { IncomingCallPopup } from "./components/call/IncomingCallPopup";
+import CallWindow from "./components/call/CallWindow";
 
 function App() {
   const navigate = useNavigate();
@@ -132,20 +135,29 @@ function App() {
 
   // Nếu đã kiểm tra xong và có authUser, hiển thị layout chính
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/profile/:userId" element={<ProfilePage />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/messages" element={<MessagesInterface />} />
-        <Route path="/messages/:conversationId" element={<MessagesInterface />} />
-        <Route path="/notification" element={<Notification />}/>
-      </Route>
-      {/* Người dùng đã đăng nhập sẽ không cần truy cập trang Auth */}
-      <Route path="/login" element={<Navigate to="/" />} />
-      <Route path="/signup" element={<Navigate to="/" />} />
-    </Routes>
+    <CallProvider authUser={authUser} apiBase="http://localhost:8085">
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/:userId" element={<ProfilePage />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/messages" element={<MessagesInterface />} />
+          <Route
+            path="/messages/:conversationId"
+            element={<MessagesInterface />}
+          />
+          <Route path="/notification" element={<Notification />} />
+        </Route>
+        {/* Người dùng đã đăng nhập sẽ không cần truy cập trang Auth */}
+        <Route path="/login" element={<Navigate to="/" />} />
+        <Route path="/signup" element={<Navigate to="/" />} />
+      </Routes>
+
+      {/* UI call module luôn mount (but renders conditionally) */}
+      <IncomingCallPopup />
+      <CallWindow />
+    </CallProvider>
   );
 }
 

@@ -24,6 +24,8 @@ public enum ErrorCode {
         PARTICIPANTS_NOT_TWO(1015, "Chat 1-1 must have exactly 2 participants", HttpStatus.BAD_REQUEST),
         NOTIFICATION_NOT_FOUND(1016, "Notification not found", HttpStatus.BAD_REQUEST),
         CALL_RECORD_NOT_FOUND(1017, "Call record not found", HttpStatus.BAD_REQUEST),
+        CALL_NOT_FOUND(1018, "User is already in another call", HttpStatus.BAD_REQUEST),
+
     ;
 
 

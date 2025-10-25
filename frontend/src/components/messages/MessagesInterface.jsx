@@ -62,6 +62,7 @@ const MessagesInterface = () => {
           <>
             <ChatHeader
               user={{
+                id: selectConversation.partnerId,
                 name: selectConversation.partnerName,
                 avatar:
                   selectConversation.partnerAvatar || "/assets/avatar.jpg",

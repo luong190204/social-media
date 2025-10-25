@@ -4,19 +4,21 @@ import { over } from "stompjs";
 
 let stompClient = null;
 
-export const connectSocket = (userId, onMessageReceived) => {
+export const connectSocket = (userId, onMessageReceived ) => {
   const token = localStorage.getItem("token");
   const socket = new SockJS(`http://localhost:8085/ws?token=${token}`);
   stompClient = over(socket);
 
   stompClient.connect({}, () => {
-    console.log("Connect to WebSocket");
+    console.log("✅ Connected to WebSocket - User ID:", userId);
 
-    // Subscribe đúng phòng
-    stompClient.subscribe(`/topic/user/${userId}`, (msg) => {
-      const newMessage = JSON.parse(msg.body);
-      onMessageReceived(newMessage);
-    });
+    // Subscribe đúng phòng tin nhắn
+    if (onMessageReceived) {
+      stompClient.subscribe(`/topic/user/${userId}`, (msg) => {
+        const newMessage = JSON.parse(msg.body);
+        onMessageReceived(newMessage);
+      });
+    }
   });
 
   stompClient.onclose = () => {
