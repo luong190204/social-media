@@ -10,7 +10,7 @@ export const connectSocket = (userId, onMessageReceived ) => {
   stompClient = over(socket);
 
   stompClient.connect({}, () => {
-    console.log("✅ Connected to WebSocket - User ID:", userId);
+    console.log("Connected to WebSocket - User ID:", userId);
 
     // Subscribe đúng phòng tin nhắn
     if (onMessageReceived) {

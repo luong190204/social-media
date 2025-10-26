@@ -43,8 +43,20 @@ public class CallSignalController {
                     .roomId(call.getRoomId())
                     .timestamp(LocalDateTime.now())
                     .build();
+            // Gửi đến đúng destination
+            messagingTemplate.convertAndSendToUser(
+                    request.getCalleeId(),
+                    "/queue/call.incoming",
+                    notification
+            );
+            log.info("Notification sent successfully to {}", request.getCalleeId());
 
-            messagingTemplate.convertAndSendToUser(request.getCalleeId(), "/queue/call.incoming", call);
+            // Gửi confirmation cho người gọi
+            messagingTemplate.convertAndSendToUser(
+                    callerId,
+                    "/queue/call.initiated",
+                    call
+            );
             log.info("Call {} initiated successfully", call.getId());
         } catch (Exception e) {
             log.error("Error initiating call", e);

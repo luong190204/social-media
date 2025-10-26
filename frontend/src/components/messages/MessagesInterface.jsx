@@ -61,12 +61,7 @@ const MessagesInterface = () => {
         {selectConversation ? (
           <>
             <ChatHeader
-              user={{
-                id: selectConversation.partnerId,
-                name: selectConversation.partnerName,
-                avatar:
-                  selectConversation.partnerAvatar || "/assets/avatar.jpg",
-              }}
+              user={selectConversation}
             />
 
             <div className="flex-1 overflow-y-auto">

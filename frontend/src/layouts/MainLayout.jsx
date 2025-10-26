@@ -1,6 +1,7 @@
 import Header from "@/components/header/Header";
 import { LeftSidebar } from "@/components/navigation";
 import BottomNavigation from "@/components/navigation/BottomNavigation";
+import { MissedCallsBadge } from "@/components/VideoCall/MissedCallsBadge";
 import React from "react";
 
 import { Outlet, useLocation } from "react-router-dom";
@@ -31,6 +32,7 @@ const MainLayout = () => {
           }`}
         >
           <Outlet />
+          <MissedCallsBadge />
         </div>
       </div>
 

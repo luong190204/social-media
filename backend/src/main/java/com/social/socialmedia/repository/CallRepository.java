@@ -33,7 +33,7 @@ public interface CallRepository extends MongoRepository<Call, String> {
     @Query(value = "{ 'calleeId': ?0, 'status': 'MISSED' }", count = true)
     long countMissedCalls(String userId);
 
-    Optional<Call> findByCallId(String callId);
+    // Optional<Call> findByCallId(String callId);
 
-    List<Call> findByCallerIdOrCalleeIdOrderByStartTimeDesc(String callerId, String calleeId);
+    // List<Call> findByCallerIdOrCalleeIdOrderByStartTimeDesc(String callerId, String calleeId);
 }

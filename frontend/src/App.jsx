@@ -19,9 +19,8 @@ import { connectSocket, disconnectSocket } from "./lib/socket";
 import { useChatStore } from "./store/useChatStore";
 import MessageToast from "./components/toast/MessageToast";
 import { useOnlineUsers } from "./lib/useOnlineUsers";
-import { CallProvider } from "./context/CallContext";
-import { IncomingCallPopup } from "./components/call/IncomingCallPopup";
-import CallWindow from "./components/call/CallWindow";
+import { useVideoCall, VideoCallProvider } from "./context/VideoCallContext";
+import VideoCallModal from "./components/VideoCall/VideoCallModal";
 
 function App() {
   const navigate = useNavigate();
@@ -35,7 +34,7 @@ function App() {
     checkAuth();
   }, [checkAuth]);
 
-  // Online users 
+  // Online users
   useOnlineUsers(authUser);
 
   // Realtime message
@@ -43,10 +42,18 @@ function App() {
     if (!authUser) return;
 
     connectSocket(authUser.id, (newMessage) => {
-      const { selectConversation, conversations, messages, setSelectConversation, fetchConversations } = useChatStore.getState();
+      const {
+        selectConversation,
+        conversations,
+        messages,
+        setSelectConversation,
+        fetchConversations,
+      } = useChatStore.getState();
 
       // Kiểm tra xem user hiện tại có đang ở đúng conversation đó không
-      const isInCurrentChat = selectConversation && selectConversation.id === newMessage.conversationId;
+      const isInCurrentChat =
+        selectConversation &&
+        selectConversation.id === newMessage.conversationId;
 
       const isInMessagePage = location.pathname.startsWith("/messages");
 
@@ -74,14 +81,14 @@ function App() {
 
         fetchConversations();
       }
-    })
+    });
 
     return () => {
       disconnectSocket();
-    }
-  }, [authUser, location])
+    };
+  }, [authUser, location]);
 
-  // Realtime notification 
+  // Realtime notification
   useEffect(() => {
     if (!authUser) return;
 
@@ -110,6 +117,45 @@ function App() {
     });
   }, [authUser]);
 
+  // Component để render VideoCallModal
+  const VideoCallGlobalModal = () => {
+    const {
+      localStream,
+      remoteStream,
+      incomingCall,
+      callStatus,
+      error,
+      isAudioMuted,
+      isVideoMuted,
+      answerCall,
+      rejectCall,
+      cancelCall,
+      endCall,
+      toggleAudio,
+      toggleVideo,
+      switchCamera,
+    } = useVideoCall();
+
+    return (
+      <VideoCallModal
+        localStream={localStream}
+        remoteStream={remoteStream}
+        incomingCall={incomingCall}
+        callStatus={callStatus}
+        error={error}
+        isAudioMuted={isAudioMuted}
+        isVideoMuted={isVideoMuted}
+        onAnswer={answerCall}
+        onReject={rejectCall}
+        onEnd={endCall}
+        onCancel={cancelCall}
+        toggleAudio={toggleAudio}
+        toggleVideo={toggleVideo}
+        switchCamera={switchCamera}
+      />
+    );
+  }
+
   // Hiển thị Loader nếu đang trong quá trình kiểm tra
   if (isCheckingAuth) {
     return (
@@ -135,7 +181,7 @@ function App() {
 
   // Nếu đã kiểm tra xong và có authUser, hiển thị layout chính
   return (
-    <CallProvider authUser={authUser} apiBase="http://localhost:8085">
+    <VideoCallProvider>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
@@ -154,10 +200,8 @@ function App() {
         <Route path="/signup" element={<Navigate to="/" />} />
       </Routes>
 
-      {/* UI call module luôn mount (but renders conditionally) */}
-      <IncomingCallPopup />
-      <CallWindow />
-    </CallProvider>
+      <VideoCallGlobalModal />
+    </VideoCallProvider>
   );
 }
 

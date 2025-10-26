@@ -34,7 +34,7 @@ public class CallController {
     private final UserRepository userRepository;
 
     // Lấy lịch sử cuộc gọi với phân trang
-    @GetMapping("/history}")
+    @GetMapping("/history")
     public ApiResponse<Page<CallHistoryResponse>> getCallHistory(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(defaultValue = "0") int page,
