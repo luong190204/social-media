@@ -25,15 +25,9 @@ public interface CallRepository extends MongoRepository<Call, String> {
     List<Call> findRecentMissedCalls(String userId, LocalDateTime since);
 
     // Tìm cuộc gọi đang diễn ra của user
-    @Query("{ $or: [ { 'callerId': ?0, 'status': { $in: ['RINGING', 'ONGOING'] } }, " +
-            "{ 'calleeId': ?0, 'status': { $in: ['RINGING', 'ONGOING'] } } ] }")
-    Optional<Call> findActiveCallByUserId(String userId);
+    List<Call> findByCallerIdOrCalleeIdAndStatusIn(String callerId, String calleeId, List<String> statuses);
 
     // Đếm cuộc gọi nhỡ chưa xem
     @Query(value = "{ 'calleeId': ?0, 'status': 'MISSED' }", count = true)
     long countMissedCalls(String userId);
-
-    // Optional<Call> findByCallId(String callId);
-
-    // List<Call> findByCallerIdOrCalleeIdOrderByStartTimeDesc(String callerId, String calleeId);
 }

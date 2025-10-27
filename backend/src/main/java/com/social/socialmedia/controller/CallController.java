@@ -85,14 +85,14 @@ public class CallController {
     }
 
     // Kiểm tra cuộc gọi đang diễn ra
-    @GetMapping("/active")
-    public ApiResponse<List<Call>> getActiveCall(@AuthenticationPrincipal UserDetails userDetails) {
-        String userId = userDetails.getUsername();
-
-        return ApiResponse.<List<Call>>builder()
-                .result(callService.getActiveCall(userId).stream().toList())
-                .build();
-    }
+//    @GetMapping("/active")
+//    public ApiResponse<List<Call>> getActiveCall(@AuthenticationPrincipal UserDetails userDetails) {
+//        String userId = userDetails.getUsername();
+//
+//        return ApiResponse.<List<Call>>builder()
+//                .result(callService.getActiveCall(userId).stream().toList())
+//                .build();
+//    }
 
     private CallHistoryResponse mapToHistoryResponse(Call call, String currentUserId) {
         boolean isIncoming = call.getCalleeId().equals(currentUserId);

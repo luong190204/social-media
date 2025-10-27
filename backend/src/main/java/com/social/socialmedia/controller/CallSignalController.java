@@ -28,12 +28,19 @@ public class CallSignalController {
     public void initiateCall(@Payload CallInitiateRequest request, Principal principal) {
         try {
             String callerId = principal.getName();
-            log.info("User {} initiating call to {}", callerId, request.getCalleeId());
+            log.info("===========================================");
+            log.info("🔵 CALL INITIATE REQUEST");
+            log.info("   Caller ID: {}", callerId);
+            log.info("   Callee ID: {}", request.getCalleeId());
+            log.info("   Caller Name: {}", request.getCallerName());
+            log.info("   Type: {}", request.getType());
+            log.info("===========================================");
 
-            // Tạo cuộc gọi mới
+            // Tạo cuộc gọi
             Call call = callService.initiateCall(callerId, request.getCalleeId(), request.getType());
+            log.info("✅ Call created with ID: {}", call.getId());
 
-            // Gửi thông báo người nhận
+            // Tạo notification
             CallNotification notification = CallNotification.builder()
                     .callId(call.getId())
                     .callerId(callerId)
@@ -43,13 +50,21 @@ public class CallSignalController {
                     .roomId(call.getRoomId())
                     .timestamp(LocalDateTime.now())
                     .build();
-            // Gửi đến đúng destination
+
+            log.info("===========================================");
+            log.info("📤 SENDING NOTIFICATION TO CALLEE");
+            log.info("   Destination: /user/{}/queue/call.incoming", request.getCalleeId());
+            log.info("   Notification: {}", notification);
+            log.info("===========================================");
+
+            // ✅ Gửi đến người nhận
             messagingTemplate.convertAndSendToUser(
                     request.getCalleeId(),
                     "/queue/call.incoming",
                     notification
             );
-            log.info("Notification sent successfully to {}", request.getCalleeId());
+
+            log.info("🟢 Notification sent to user: {}", request.getCalleeId());
 
             // Gửi confirmation cho người gọi
             messagingTemplate.convertAndSendToUser(
@@ -57,9 +72,12 @@ public class CallSignalController {
                     "/queue/call.initiated",
                     call
             );
-            log.info("Call {} initiated successfully", call.getId());
+
+            log.info("🟢 Confirmation sent to caller: {}", callerId);
+            log.info("===========================================");
+
         } catch (Exception e) {
-            log.error("Error initiating call", e);
+            log.error("❌ ERROR in initiateCall: {}", e.getMessage(), e);
             messagingTemplate.convertAndSendToUser(
                     principal.getName(),
                     "/queue/errors",

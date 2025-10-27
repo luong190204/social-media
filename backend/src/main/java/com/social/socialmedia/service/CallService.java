@@ -30,27 +30,32 @@ public class CallService {
     private final CallRepository callRepository;
 
    // Tạo record mới khi user A bắt đầu gọi user B, Khởi tạo cuộc gọi mới
-    @Transactional
-    public Call initiateCall(String callerId, String calleeId, CallType type) {
-        log.info("Initiating call from {} to {} with type {}", callerId, calleeId, type);
+   @Transactional
+   public Call initiateCall(String callerId, String calleeId, CallType type) {
+       log.info("Initiating call from {} to {} with type {}", callerId, calleeId, type);
 
-        // Kiểm tra xem user có đang trong cuộc gọi khác không
-        Optional<Call> activeCall = callRepository.findActiveCallByUserId(callerId);
-        if (activeCall.isPresent()) {
-            throw new AppException(ErrorCode.CALL_NOT_FOUND);
-        }
-        Call call = Call.builder()
-                .callerId(callerId)
-                .calleeId(calleeId)
-                .type(type)
-                .status(CallStatus.RINGING)
-                .createdAt(LocalDateTime.now())
-                .roomId(UUID.randomUUID().toString())
-                .build();
+       // Kiểm tra cả 2 phía
+       List<Call> activeCalls = callRepository.findByCallerIdOrCalleeIdAndStatusIn(
+               callerId, calleeId, List.of("RINGING", "ONGOING")
+       );
 
-        Call saved = callRepository.save(call);
-        return saved;
-    }
+       if (!activeCalls.isEmpty()) {
+           log.warn("User already has active calls: {}", activeCalls.size());
+           // Có thể lấy call đầu tiên hoặc từ chối cuộc gọi mớ
+       }
+
+
+       Call call = Call.builder()
+               .callerId(callerId)
+               .calleeId(calleeId)
+               .type(type)
+               .status(CallStatus.RINGING)
+               .createdAt(LocalDateTime.now())
+               .roomId(UUID.randomUUID().toString())
+               .build();
+
+       return callRepository.save(call);
+   }
 
     // Cập nhật trạng thái cuộc gọi
     public Call updateCallStatus(String callId, CallStatus status) {
@@ -167,9 +172,9 @@ public class CallService {
     }
 
     // Kiểm tra user có đang trong cuộc gọi không
-    public Optional<Call> getActiveCall(String userId) {
-        return callRepository.findActiveCallByUserId(userId);
-    }
+//    public Optional<Call> getActiveCall(String userId) {
+//        return callRepository.findActiveCallByUserId(userId);
+//    }
 
     private void calculateDuration(Call call) {
         if (call.getStartedAt() != null && call.getEndedAt() != null) {
