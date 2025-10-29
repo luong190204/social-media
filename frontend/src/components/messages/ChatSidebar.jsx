@@ -12,7 +12,7 @@ export const ChatSidebar = ({ partner, selectedUser, onUserSelect }) => {
   return (
     <div className="hidden md:block w-[400px] border-r border-gray-200 overflow-y-auto">
       {/* Header */}
-      <div className="p-4 border-b flex items-center">
+      <div className="p-4 border-b flex items-center pt-10">
         <h1 className="text-xl font-semibold">{authUser.username}</h1>
         <div className="ml-auto">
           <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
